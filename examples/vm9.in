@@ -1,0 +1,15 @@
+  &pltpar  izort=1, imod=0, ivel=0, ivp=1, ivrms=0,
+           velht=.5, xtinc=.1, ntsmth=0, iplot=2,  
+           idump=0, inode=1, symht=3., idcol=2, ivcol=4,
+           xwndow=292., ywndow=175.,
+  &end
+  &axepar  xmin=-10., xmax=10., xmm=200.,
+           zmin=1., zmax=3., zmm=150., 
+           vmin=1.4, vmax=2.5, vmm=200., 
+           vrmin=0., vrmax=7.,
+           tmin=1., tmax=4., tmm=150.,
+           albht=3., 
+  &end
+  &modpar dvvmax=.5 dlvmax=.10, dsmax=20.,
+          velmax=8.5,
+  &end

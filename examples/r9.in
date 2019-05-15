@@ -1,0 +1,34 @@
+  &pltpar  isep=0, itx=1, itxout=2, idata=1,
+           imod=1, ibnd=0, iray=2, isum=2,
+           iroute=4, iplot=0, iseg=0, vred=0,
+           xwndow=292., ywndow=175.,
+           ircol=1, itcol=1
+           modout=0, dxmod=0.05, dzmod=0.002,
+           modi=1,2,5, xmmin=-10., xmmax=10.,
+  &end
+
+  &axepar  xmin=-10, xmax=10
+           zmin=0, zmax=3
+           tmin=0, tmax=2
+  &end   
+
+  &trapar  imodf=1, ibsmth=1, i2pt=0,
+           ishot=2
+           xshot=0.464
+           zshot=1.997
+           ray=1.2, 2.2, 3.2, 4.2, 5.2, 6.2, 7.2, 8.2, 9.2, 10.2, 11.2, 12.2, 13.2
+
+           nray=50
+           nsmax=50
+           aamin=0.00, aamax=90
+  &end
+
+  &invpar  invr=1
+           ximax=0
+           ivray=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
+  &end
+
+  &amppar iamp=1, isect=1, icmp=1, icomp=1,
+          xmins=-10., xmaxs=10., xincs=0.1,
+          hedcut=25, omega=50,
+  &end

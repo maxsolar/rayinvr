@@ -1,0 +1,26 @@
+c
+c     ----------------------------------------------------------------
+c
+      integer player,ppcntr,ptrap,ppvel,pncntr,pxgrid,pzgrid,
+     &	pinvel
+c
+      parameter(player=50, ppcntr=100,  ptrap=400,
+     +          ppvel=200,pxgrid=3201,pzgrid=1001)
+c
+      parameter(pncntr=player+1, pinvel=player*2)
+c
+c     player - model layers
+c
+c     ppcntr - points defining a single model layer
+c              (must be a multiple of 10)
+c
+c     ppvel - points at which upper and lower layer velocities defined
+c             (must be a multiple of 10)
+c
+c     ptrap - trapezoids with a layer
+c
+c     pxgrid - number of grid points in x-direction for output of 
+c              uniformly sampled velocity mdoel
+c
+c     pzgrid - number of grid points in z-direction for output of 
+c             uniformly sampled velocity mdoel

@@ -1,0 +1,35 @@
+This is a modified version of Rayinvr, with the G77 patch applied.
+
+The modifications include an increase of precision from 10 metres for depth
+nodes to 1 m.  Velocity nodes have been changed from 10 m/s precision to 1 m/s.
+This was done to allow greater accuracy for high resolution velocity analysis.
+
+The only changes made were to the format of input and output.  Here are the 
+changes made to main.f for rayinvr (lines 240 and 242, '-' is modified, '+' is original):
+-15       format(i2,1x,10f8.3)
++15       format(i2,1x,10f7.2)
+-235      format(3x,10(6x,i2))
++235      format(3x,10(5x,i2))
+
+Example 9 in the examples directory includes sample .in files with the new format, 
+and can be run the same as the other examples (the old examples will not work with 
+the new binaries).
+
+
+NOTE: The increase in precision has required a slight change to the v.in 
+velocity model format which is incompatible with the original v.in format. 
+The following programs have been modified to use this new precision (other 
+utilities will probably not work correctly):
+
+rayinvr/Xrayinvr
+vmodel/xvmodel
+dmplstsqr
+c2v/v2c (included in this directory)
+
+
+Also the maximum number of layers has been increased from 12 to 32.
+
+
+Chris LeBlanc
+Dalhousie University
+2005

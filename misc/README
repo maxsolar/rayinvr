@@ -1,0 +1,7 @@
+The files v2c.com and v2c.par are "include files" for v2c.f.
+
+v2c can be compiled using something like:
+	f77 v2c.f -o v2c
+Similarly, c2v can be compiled using something like:
+	f77 c2v.f -o c2v
+
