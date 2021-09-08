@@ -1,0 +1,965 @@
+diff -u -r misc/iseis.f ../rayinvr_g77/misc/iseis.f
+--- misc/iseis.f	2000-05-20 14:40:57.000000000 -0600
++++ ../rayinvr_g77/misc/iseis.f	2003-11-18 16:37:48.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c                 
+ c     version 1.3  Aug 1992
+ c                 
+@@ -35,11 +38,10 @@
+       integer ir(10000),irhh(10000),ipseis(10000)
+       character*72 ifname,ofname
+ c
+-      write(*,*, fmt="(/'Enter input file name')")
++      write(*,*)'Enter input file name'
+       read(5,85) ifname
+ 85    format(a72)
+-      write(*,*, fmt=
+-     +  "(/'Enter output file name (default is input file)')")
++      write(*,*)'Enter output file name (default is input file)'
+       read(5,85) ofname
+       if(ofname.eq.'') ofname=ifname
+       open(unit=10, file=ifname, status='old')
+diff -u -r misc/order_picks.f ../rayinvr_g77/misc/order_picks.f
+--- misc/order_picks.f	2000-05-20 14:40:57.000000000 -0600
++++ ../rayinvr_g77/misc/order_picks.f	2003-11-18 16:33:06.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.3  Aug 1992
+ c
+@@ -16,17 +19,16 @@
+ c     ----------------------------------------------------------------
+ c
+       integer pmax,pshot
+-      parameter(pmax=60000, pshot=400)
++      parameter(pmax=60000, pshot=100)
+       real x(pmax),t(pmax),u(pmax),xh(pmax),th(pmax),uh(pmax),
+      +     xw(pmax),tw(pmax),uw(pmax)
+       integer ip(pmax),iph(pmax),ipw(pmax),ipos(pmax),ishot(pshot+1)
+       character*72 ifname,ofname
+ c
+-      write(*,*, fmt="(/'Enter input file name')")
++      write(*,*)'Enter input file name'
+       read(5,15) ifname
+ 15    format(a72)
+-      write(*,*, fmt=
+-     +  "(/'Enter output file name (default is input file)')")
++      write(*,*)'Enter output file name (default is input file)'
+       read(5,15) ofname
+       if(ofname.eq.'') ofname=ifname
+       open(unit=10, file=ifname, status='old')
+@@ -117,9 +119,9 @@
+ 9999  continue
+ c
+       nshot=numf-npicks-1
+-      write(*,*, fmt="(/'number of lines in file: ',i10)") numf
+-      write(*,*, fmt="('number of shots:         ',i10)") nshot
+-      write(*,*, fmt="('number of picks:         ',i10/)") npicks
++      write(*,*)'number of lines in file: ',numf
++      write(*,*)'number of shots:         ',nshot
++      write(*,*)'number of picks:         ',npicks
+       stop
+       end
+ c                 
+diff -u -r misc/phercount.f ../rayinvr_g77/misc/phercount.f
+--- misc/phercount.f	2000-05-20 14:40:57.000000000 -0600
++++ ../rayinvr_g77/misc/phercount.f	2003-11-18 16:34:51.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.4  Dec 1993
+ c
+@@ -47,15 +50,15 @@
+         write(8,40) (i,i=1,ipmax)
+         write(9,40) (i,i=1,ipmax)
+  40     format(/,'     xshot      ',
+-     &  i2,<ipmax-1>i5/,
+-     &  '-------------',<ipmax>('-----'),'-----------')
++     &  i2,999i5/,
++     &  '-------------',1000('-----'),'-----------')
+       else
+         write(6,41) (i,i=1,ipmax)
+         write(8,41) (i,i=1,ipmax)
+         write(9,41) (i,i=1,ipmax)
+  41     format(/,'     xshot      ',
+      &  i2/,
+-     &  '-------------',<ipmax>('-----'),'-----------')
++     &  '-------------',1000('-----'),'-----------')
+       end if
+       nshot=0
+  10   continue
+@@ -70,7 +73,7 @@
+         if(nshot.ge.1) then
+           write(6,15) xshot,(k(i),i=1,ipmax),kt
+           write(8,15) xshot,(k(i),i=1,ipmax),kt
+- 15     format(f10.3,5x,<ipmax>(i3,2x),' = ',2x,i4)
++ 15     format(f10.3,5x,1000(i3,2x),' = ',2x,i4)
+           do 888 i=1,ipmax
+             if(k(i).eq.0) then
+               err(i)=0.
+@@ -84,7 +87,7 @@
+             ketkt=ket/kt
+           end if
+           write(9,115) xshot,(err(i),i=1,ipmax),ketkt
+- 115      format(f10.3,5x,<ipmax>(f4.3,1x),' = ',2x,f4.3)
++ 115      format(f10.3,5x,1000(f4.3,1x),' = ',2x,f4.3)
+         end if
+         nshot=nshot+1
+         do 20 i=1,ipmax
+@@ -109,15 +112,15 @@
+       write(8,27)
+       write(9,27)
+  27   format(13x,
+-     &<ipmax>('-----'),'-----------')
++     &1000('-----'),'-----------')
+       if(ipmax.gt.1) then
+         write(6,25) (kg(i),i=1,ipmax),kgt
+         write(8,25) (kg(i),i=1,ipmax),kgt
+- 25     format(' totals  ',4x,i5,2x,<ipmax-1>(i4,1x),' = ',2x,i5)
++ 25     format(' totals  ',5x,i4,2x,999(i4,1x),' = ',2x,i4)
+       else
+         write(6,26) (kg(i),i=1,ipmax),kgt
+         write(8,26) (kg(i),i=1,ipmax),kgt
+- 26     format(' totals  ',4x,i5,2x,' = ',2x,i5)
++ 26     format(' totals  ',5x,i4,2x,' = ',2x,i4)
+       end if
+       do 889 i=1,ipmax
+         if(kg(i).eq.0) then
+@@ -128,7 +131,7 @@
+  889  continue
+       if(ipmax.gt.1) then
+         write(9,125) (errg(i),i=1,ipmax),kegt/kgt
+- 125    format(' totals  ',6x,f4.3,1x,<ipmax-1>(f4.3,1x),' = ',2x,f4.3)
++ 125    format(' totals  ',6x,f4.3,1x,999(f4.3,1x),' = ',2x,f4.3)
+       else
+         write(9,126) (errg(i),i=1,ipmax),kegt/kgt
+  126    format(' totals  ',6x,f4.3,1x,' = ',2x,f4.3)
+diff -u -r misc/reciprocity2.f ../rayinvr_g77/misc/reciprocity2.f
+--- misc/reciprocity2.f	2000-05-20 14:40:58.000000000 -0600
++++ ../rayinvr_g77/misc/reciprocity2.f	2003-11-18 16:35:33.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.4  Dec 1993
+ c
+@@ -67,11 +70,11 @@
+       write(11,115) (i,i=1,nshot)
+       write(6,115) (i,i=1,nshot)
+ 115   format(/'shot offsets (km):'/
+-     +  /'nshot',<nshot>i9/'-----',<nshot>('---------'))
++     +  /'nshot',1000i9/'-----',1000('---------'))
+       do 110 i=1,nshot
+          write(11,105) i,(xshot(j)-xshot(i),j=1,nshot)
+          write(*,105) i,(xshot(j)-xshot(i),j=1,nshot)
+-105      format(i5,<nshot>f9.4)
++105      format(i5,1000f9.4)
+ 110   continue
+ c
+       i=1
+@@ -391,7 +394,7 @@
+         write(12,44) (i,i=1,nshot),(delta(i),i=1,nshot)
+         write(6,44) (i,i=1,nshot),(delta(i),i=1,nshot)
+ 44      format('time shifts for each shot:'/
+-     +  <nshot>i8/<nshot>f8.4/)
++     +  1000i8/1000f8.4/)
+ c
+         nused=0
+         func=0.
+diff -u -r misc/reciprocity.f ../rayinvr_g77/misc/reciprocity.f
+--- misc/reciprocity.f	2000-05-20 14:40:58.000000000 -0600
++++ ../rayinvr_g77/misc/reciprocity.f	2003-11-18 16:35:10.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.4  Dec 1993
+ c
+@@ -67,11 +70,11 @@
+       write(11,115) (i,i=1,nshot)
+       write(6,115) (i,i=1,nshot)
+ 115   format(/'shot offsets (km):'/
+-     +  /'nshot',<nshot>i9/'-----',<nshot>('---------'))
++     +  /'nshot',1000i9/'-----',1000('---------'))
+       do 110 i=1,nshot
+          write(11,105) i,(xshot(j)-xshot(i),j=1,nshot)
+          write(*,105) i,(xshot(j)-xshot(i),j=1,nshot)
+-105      format(i5,<nshot>f9.2)
++105      format(i5,1000f9.2)
+ 110   continue
+ c
+       i=1
+@@ -391,7 +394,7 @@
+         write(12,44) (i,i=1,nshot),(delta(i),i=1,nshot)
+         write(6,44) (i,i=1,nshot),(delta(i),i=1,nshot)
+ 44      format('time shifts for each shot:'/
+-     +  <nshot>i8/<nshot>f8.3/)
++     +  1000i8/1000f8.3/)
+ c
+         nused=0
+         func=0.
+diff -u -r misc/resample.f ../rayinvr_g77/misc/resample.f
+--- misc/resample.f	2000-05-20 14:40:58.000000000 -0600
++++ ../rayinvr_g77/misc/resample.f	2003-11-18 16:34:47.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.3  Aug 1992
+ c
+@@ -21,18 +24,17 @@
+       integer ip(pmax),iph(pmax),ishot(pshot+1)
+       character*72 ifname,ofname
+ c
+-      write(*,*, fmt="(/'Enter input file name')")
++      write(*,*)'Enter input file name'
+       read(5,15) ifname
+ 15    format(a72)
+-      write(*,*, fmt=
+-     +  "(/'Enter output file name (default is input file)')")
++      write(*,*)'Enter output file name (default is input file)'
+       read(5,15) ofname
+       if(ofname.eq.'') ofname=ifname
+ c
+       open(10, file=ifname, status='old')
+       open(11, file=ofname)
+ c
+-      write(*,*, fmt="(/'Enter nominal receiver spacing (km)')")
++      write(*,*)'Enter nominal receiver spacing (km)'
+       read(5,*) xinc
+ c
+       i=1
+@@ -145,7 +147,7 @@
+ c
+ 9999  continue
+ c
+-      write(*,*, fmt="(/'number of lines in file: ',i10)") numf
+-      write(*,*, fmt="('number of picks:         ',i10/)") npicks
++      write(*,*)'number of lines in file: ',numf
++      write(*,*)'number of picks:         ',npicks
+       stop
+       end
+diff -u -r misc/smooth_picks.f ../rayinvr_g77/misc/smooth_picks.f
+--- misc/smooth_picks.f	2000-05-20 14:40:58.000000000 -0600
++++ ../rayinvr_g77/misc/smooth_picks.f	2003-11-18 16:35:27.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.3  Aug 1992
+ c
+@@ -29,17 +32,16 @@
+       integer ip(pmax),iph(pmax),ipw(pmax)
+       character*72 ifname,ofname
+ c
+-      write(*,*, fmt="(/'Enter input file name')")
++      write(*,*)'Enter input file name'
+       read(5,15) ifname
+ 15    format(a72)
+-      write(*,*, fmt=
+-     +  "(/'Enter output file name (default is input file)')")
++      write(*,*)'Enter output file name (default is input file)'
+       read(5,15) ofname
+       if(ofname.eq.'') ofname=ifname
+       open(unit=10, file=ifname, status='old')
+       open(unit=11, file=ofname)
+-      write(*,*, fmt="(/
+-     +'Enter number of smoothing applications (>0) or factor (<0)')")
++      write(*,*)'Enter number of smoothing applications (>0) or factor (
++     &<0)'
+       read(5,*) rsmth
+ c
+       i=1
+@@ -107,9 +109,9 @@
+ 9999  continue
+ c
+       nshot=numf-npicks-1
+-      write(*,*, fmt="(/'number of lines in file: ',i10)") numf
+-      write(*,*, fmt="('number of shots:         ',i10)") nshot
+-      write(*,*, fmt="('number of picks:         ',i10/)") npicks
++      write(*,*)'number of lines in file: ',numf
++      write(*,*)'number of shots:         ',nshot
++      write(*,*)'number of picks:         ',npicks
+       stop
+       end
+ c                 
+diff -u -r misc/tx2pois.f ../rayinvr_g77/misc/tx2pois.f
+--- misc/tx2pois.f	2000-05-20 14:40:58.000000000 -0600
++++ ../rayinvr_g77/misc/tx2pois.f	2003-11-18 16:34:01.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.2  Mar 1992
+ c
+@@ -50,8 +53,8 @@
+ 999   write(13,5) xp,tp,up,ip
+ 5     format(3f10.3,i10)
+ c
+-      write(*,*, fmt="('number of picks matched:   ',i6)") npick
+-      write(*,*, fmt="('number of shots:           ',i6/)") nshot
++      write(*,*)'number of picks matched:   ',npick
++      write(*,*)'number of shots:           ',nshot
+ c
+       stop
+       end
+diff -u -r misc/tx2rec.f ../rayinvr_g77/misc/tx2rec.f
+--- misc/tx2rec.f	2000-05-20 14:40:58.000000000 -0600
++++ ../rayinvr_g77/misc/tx2rec.f	2003-11-18 16:35:08.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.2  Mar 1992
+ c
+@@ -50,6 +53,6 @@
+       end if
+ 5     format(f10.3,i10)
+ c
+-999   write(*,*, fmt="(/'number of receivers: ',i6/)") n
++999   write(*,*)'number of receivers: ',n
+       stop
+       end
+diff -u -r misc/txmatch.f ../rayinvr_g77/misc/txmatch.f
+--- misc/txmatch.f	2000-05-20 14:40:58.000000000 -0600
++++ ../rayinvr_g77/misc/txmatch.f	2003-11-18 16:34:27.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.2  Mar 1992
+ c
+@@ -77,9 +80,9 @@
+       write(14,5) x1,t1,u1,i1
+ 5     format(3f10.3,i10)
+ c
+-      write(*,*, fmt="('number of picks matched:   ',i6)") npickm
+-      write(*,*, fmt="('number of picks unmatched: ',i6)") npicku
+-      write(*,*, fmt="('number of shots:           ',i6/)") nshot
++      write(*,*)'number of picks matched:   ',npickm
++      write(*,*)'number of picks unmatched: ',npicku
++      write(*,*)'number of shots:           ',nshot
+ c
+       stop
+       end
+diff -u -r misc/txoffset2.f ../rayinvr_g77/misc/txoffset2.f
+--- misc/txoffset2.f	2000-05-20 14:40:58.000000000 -0600
++++ ../rayinvr_g77/misc/txoffset2.f	2003-11-18 16:35:25.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.2  Mar 1992
+ c
+@@ -67,7 +70,7 @@
+ c
+       stop
+ c
+-999   write(*,*, fmt="(/'***  end of file reached  ***/')") n
++999   write(*,*)'***  end of file reached  ***/'
+ c
+       stop
+       end
+diff -u -r misc/txoffset.f ../rayinvr_g77/misc/txoffset.f
+--- misc/txoffset.f	2000-05-20 14:40:58.000000000 -0600
++++ ../rayinvr_g77/misc/txoffset.f	2003-11-18 16:33:02.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.2  Mar 1992
+ c
+@@ -62,7 +65,7 @@
+ c
+       stop
+ c
+-999   write(*,*, fmt="(/'***  end of file reached  ***/')") n
++999   write(*,*)'***  end of file reached  ***/'
+ c
+       stop
+       end
+diff -u -r misc/txphase.f ../rayinvr_g77/misc/txphase.f
+--- misc/txphase.f	2000-05-20 14:40:58.000000000 -0600
++++ ../rayinvr_g77/misc/txphase.f	2003-11-18 16:35:37.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.2  Mar 1992
+ c
+@@ -40,7 +43,7 @@
+         stop
+       end if
+ c
+-101   write(*,*, fmt="(/'number of phases selected: ',i6)") np
++101   write(*,*)'number of phases selected: ',np
+ c
+ 100   read(11,*,end=999) x,t,u,i
+ c
+@@ -76,8 +79,8 @@
+       end if
+ 5     format(3f10.3,i10)
+ c
+-999   write(*,*, fmt="('number of picks: ',i6)") npick
+-      write(*,*, fmt="('number of shots: ',i6/)") nshot
++999   write(*,*)'number of picks: ',npick
++      write(*,*)'number of shots: ',nshot
+ c
+       stop
+       end
+diff -u -r misc/txshift.f ../rayinvr_g77/misc/txshift.f
+--- misc/txshift.f	2000-05-20 14:40:58.000000000 -0600
++++ ../rayinvr_g77/misc/txshift.f	2003-11-18 16:33:54.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.4  Dec 1993
+ c
+@@ -41,7 +44,7 @@
+         stop
+       end if
+ c
+-101   write(*,*, fmt="(/'number of shots selected: ',i6)") ns
++101   write(*,*)'number of shots selected: ',ns
+ c
+ 100   read(11,*,end=999) x,t,u,i
+ c
+@@ -71,8 +74,8 @@
+       end if
+ 5     format(3f10.3,i10)
+ c
+-999   write(*,*, fmt="('number of picks: ',i6)") npick
+-      write(*,*, fmt="('number of shots: ',i6/)") nshot
++999   write(*,*)'number of picks: ',npick
++      write(*,*)'number of shots: ',nshot
+ c
+       stop
+       end
+diff -u -r misc/vex.f ../rayinvr_g77/misc/vex.f
+--- misc/vex.f	2000-05-20 14:40:58.000000000 -0600
++++ ../rayinvr_g77/misc/vex.f	2003-11-18 16:33:58.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c                 
+ c     version 1.2  Oct 1992
+ c
+@@ -36,13 +39,12 @@
+      +        ivarz(player,ppcntr),ivarv(player,ppvel,2)
+       character*72 ofname,ifname
+ c                 
+-      write(*,*, fmt=
+-     +  "(/'Enter input file name (default is v.in)')")
++      write(*,*)'Enter input file name (default is v.in)'
+       read(5,15) ifname
+ 15    format(a72)
+       if(ifname.eq.'') ifname='v.in'
+-      write(*,*, fmt="(/
+-     +'Enter output file name (default is overwriting input file)')")
++      write(*,*)'Enter output file name (default is overwriting input fi
++     &le)'
+       read(5,15) ofname
+       if(ofname.eq.'') ofname=ifname
+ c
+diff -u -r misc/xshot.f ../rayinvr_g77/misc/xshot.f
+--- misc/xshot.f	2000-05-20 14:40:58.000000000 -0600
++++ ../rayinvr_g77/misc/xshot.f	2003-11-18 16:34:49.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.3  Aug 1992
+ c
+@@ -18,11 +21,10 @@
+ c
+       character*72 ifname,ofname
+ c
+-      write(*,*, fmt="(/'Enter input file name')")
++      write(*,*)'Enter input file name'
+       read(5,15) ifname
+ 15    format(a72)
+-      write(*,*, fmt=
+-     +  "(/'Enter output file name (default is input file)')")
++      write(*,*)'Enter output file name (default is input file)'
+       read(5,15) ofname
+       if(ofname.eq.'') ofname=ifname
+       open(unit=10, file=ifname, status='old')
+diff -u -r pltlib/pltlib.f ../rayinvr_g77/pltlib/pltlib.f
+--- pltlib/pltlib.f	2000-05-20 14:40:57.000000000 -0600
++++ ../rayinvr_g77/pltlib/pltlib.f	2003-11-18 16:33:32.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.3  Aug 1992
+ c
+@@ -192,7 +195,7 @@
+ c
+       if(iplot.le.0) write(19,5) 
+      +  3,nchar,x,y,ht,ang,(label(i),i=1,nchar)
+-5     format(i2/i10/4e15.5,<nchar>a1)
++5     format(i2/i10/4e15.5,10000a1)
+ c
+       return
+       end
+diff -u -r pltsyn/Makefile ../rayinvr_g77/pltsyn/Makefile
+--- pltsyn/Makefile	2000-05-20 14:40:57.000000000 -0600
++++ ../rayinvr_g77/pltsyn/Makefile	2003-11-18 16:34:21.000000000 -0700
+@@ -1,13 +1,16 @@
++#     File patched for g77 compilation
++#     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++#
+ #
+ # makefile for PLTSYN
+ #
+-EXEDIR=/elmore/sunbin/
+-PLTLIB=/elmore/src/pltlib
++EXEDIR=../bin/
++PLTLIB=../pltlib
+ #
+ # compile flags
+ #
+ FFLAGS =  -O
+-CFLAGS =  -O -I/usr/openwin/include
++CFLAGS =  -O
+ #
+ #rules for compiling .f files:
+ #
+@@ -29,12 +32,13 @@
+ #
+ pltsyn: $(PLTSYN_EXEC)
+ $(PLTSYN_EXEC): ${PLTSYN_OBJS}
+-	unilink ${PLTSYN_OBJS}
++#	unilink ${PLTSYN_OBJS}
++	f77 -o main ${PLTSYN_OBJS}
+ 	mv main ${PLTSYN_EXEC}
+ #
+ xpltsyn: $(XPLTSYN_EXEC)
+ $(XPLTSYN_EXEC): ${XPLTSYN_OBJS}
+-	f77 -o main ${XPLTSYN_OBJS} -L/usr/openwin/lib -lX11
++	f77 -o main ${XPLTSYN_OBJS} -L/usr/lib/X11 -lX11
+ 	mv main ${XPLTSYN_EXEC}
+ #
+ # dependencies
+diff -u -r pltsyn/pltsec.f ../rayinvr_g77/pltsyn/pltsec.f
+--- pltsyn/pltsec.f	2000-05-20 14:40:57.000000000 -0600
++++ ../rayinvr_g77/pltsyn/pltsec.f	2003-11-18 16:34:05.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c                 
+ c     version 1.2  Mar 1992
+ c                 
+@@ -250,8 +253,7 @@
+           end if
+         end if
+         go to 107
+-108     if(namp.eq.0) write(*,*, fmt="(/
+-     +                '***  error in file tx.out  ***'/)")
++108     if(namp.eq.0) write(*,*)'***  error in file tx.out  ***'
+         if(namp.gt.0) write(18,45) xshot,0.,0.,0
+       end if
+       idir=1      
+diff -u -r rayinvr/main.f ../rayinvr_g77/main.f
+--- rayinvr/main.f	2000-05-20 14:40:56.000000000 -0600
++++ ../rayinvr_g77/main.f	2003-11-18 16:33:40.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.4  Apr 1993
+ c
+@@ -72,7 +75,7 @@
+      +        poisl(papois),poisb(papois),ibreak(prayf),frbnd(prayf),
+      +        ifo2pt(pnobsf),ipos(pr2pt),modi(player),nsmin(prayf),
+      +        insmth(pncntr)
+-      character flag*1,title*80
++      character flag*1
+ c
+       include 'rayinvr.com'                 
+ c                 
+@@ -399,8 +402,8 @@
+         read(30,555) (xfrefl(nfrefl,i),i=1,npfref(nfrefl))
+         read(30,555) (zfrefl(nfrefl,i),i=1,npfref(nfrefl))
+         read(30,575) (ivarf(nfrefl,i),i=1,npfref(nfrefl))
+-555     format(3x,<npfref(nfrefl)>f7.2)
+-575     format(3x,<npfref(nfrefl)>i7)
++555     format(3x,1000000f7.2)
++575     format(3x,1000000i7)
+         go to 590
+ 595     close(30)
+         do 550 i=1,ngroup    
+diff -u -r rayinvr/Makefile ../rayinvr_g77/Makefile
+--- rayinvr/Makefile	2000-05-20 14:40:56.000000000 -0600
++++ ../rayinvr_g77/Makefile	2003-11-18 16:35:03.000000000 -0700
+@@ -1,14 +1,17 @@
++#     File patched for g77 compilation
++#     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++#
+ #
+ # makefile for RAYINVR
+ #
+-EXEDIR=/net/ray/sunbin/
+-PLTLIB=/net/ray/src/pltlib
++EXEDIR=../bin/
++PLTLIB=../pltlib/
+ #
+ # compile flags
+ #
+ FFLAGS =  -O
+ #CFLAGS =  -O -I/usr/openwin/include
+-CFLAGS =  -O -I/usr/openwin/share/include
++CFLAGS =  -O
+ #
+ #rules for compiling .f files:
+ #
+@@ -36,7 +39,7 @@
+ #
+ xrayinvr: $(XRAYINVR_EXEC)
+ $(XRAYINVR_EXEC): ${XRAYINVR_OBJS}
+-	f77 -o main ${XRAYINVR_OBJS} -L/usr/openwin/lib -lX11
++	f77 -o main ${XRAYINVR_OBJS} -L/usr/lib/X11 -lX11
+ 	mv main ${XRAYINVR_EXEC}
+ #
+ # dependencies
+@@ -67,6 +70,6 @@
+  
+ 
+ $(PLTLIB)/xbuplot.o: FORCE
+-	cd $(@D);cc -O -I/usr/openwin/share/include -c xbuplot.c
++	cd $(@D);cc -O -I/usr/include/X11 -c xbuplot.c
+ FORCE:
+ 
+diff -u -r rayinvr/plt.f ../rayinvr_g77/plt.f
+--- rayinvr/plt.f	2000-05-20 14:40:56.000000000 -0600
++++ ../rayinvr_g77/plt.f	2003-11-18 16:33:51.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.3  Aug 1992
+ c                 
+@@ -771,7 +774,7 @@
+       end if
+ c
+       if(istep.eq.1) write(6,5) anglew
+-5     format('take-off angle: ',f10.5$)
++5     format('take-off angle: ',f10.5)
+ c
+       if(ircol.ne.0) call pcolor(irrcol)
+ c
+diff -u -r rayinvr/rngkta.f ../rayinvr_g77/rngkta.f
+--- rayinvr/rngkta.f	2000-05-20 14:40:56.000000000 -0600
++++ ../rayinvr_g77/rngkta.f	2003-11-18 16:34:12.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c                 
+ c     version 1.3  Aug 1992
+ c
+@@ -13,7 +16,7 @@
+       real y(2),f(2),t(2),s(2),g(2) 
+       logical*1 be,bh,br,bx 
+       logical bxx
+-      common /rkc$/ bxx
++      common /rkcS/ bxx
+ c                 
+       bh=.true.   
+       br=.true.   
+diff -u -r rayinvr/trc.f ../rayinvr_g77/trc.f
+--- rayinvr/trc.f	2000-05-20 14:40:56.000000000 -0600
++++ ../rayinvr_g77/trc.f	2003-11-18 16:33:44.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.3  Aug 1992
+ c     
+@@ -495,7 +498,7 @@
+       real y(2),f(2)
+       logical ok 
+       include 'rayinvr.com'
+-      common /rkc$/ ok
++      common /rkcS/ ok
+ c
+       f(1)=1./tan(y(2))
+       term1=c(layer,iblk,3)+c(layer,iblk,4)*x
+@@ -530,7 +533,7 @@
+       real y(2),f(2)
+       logical ok
+       include 'rayinvr.com'
+-      common /rkc$/ ok
++      common /rkcS/ ok
+ c
+       f(1)=tan(y(2))
+       term1=c(layer,iblk,3)+c(layer,iblk,4)*y(1)
+diff -u -r rayplot/Makefile ../rayinvr_g77/rayplot/Makefile
+--- rayplot/Makefile	2000-05-20 14:40:57.000000000 -0600
++++ ../rayinvr_g77/rayplot/Makefile	2003-11-18 16:35:19.000000000 -0700
+@@ -1,13 +1,16 @@
++#     File patched for g77 compilation
++#     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++#
+ #
+ # makefile for RAYPLOT
+ #
+-EXEDIR=/net/ray/sunbin/
+-PLTLIB=/net/ray/src/pltlib
++EXEDIR=../bin/
++PLTLIB=../pltlib/
+ #
+ # compile flags
+ #
+ FFLAGS =  -O 
+-CFLAGS =  -O -I/usr/openwin/include
++CFLAGS =  -O
+ #
+ #rules for compiling .f files:
+ #
+@@ -34,7 +37,7 @@
+ #
+ xrayplot: $(XRAYPLOT_EXEC)
+ $(XRAYPLOT_EXEC): ${XRAYPLOT_OBJS}
+-	f77 -o rayplot ${XRAYPLOT_OBJS} -L/usr/openwin/lib -lX11
++	f77 -o rayplot ${XRAYPLOT_OBJS} -L/usr/lib/X11 -lX11
+ 	mv rayplot ${XRAYPLOT_EXEC}
+ 
+ $(PLTLIB)/pltsub.o: FORCE
+diff -u -r rayplot/rayplot.f ../rayinvr_g77/rayplot/rayplot.f
+--- rayplot/rayplot.f	2000-05-20 14:40:57.000000000 -0600
++++ ../rayinvr_g77/rayplot/rayplot.f	2003-11-18 16:33:48.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.2  Mar 1992
+ c                 
+@@ -126,7 +129,7 @@
+ 3000  read(20,35) nchar
+ 35    format(2i10)
+       read(20,45) x,y,albht,angle,(label(i),i=1,nchar)
+-45    format(4e15.5,<nchar>a1)
++45    format(4e15.5,10000a1)
+       x=x*xsf+x0
+       y=y*ysf+y0
+       albht=albht*asf
+Only in rayplot: rayplot.o
+diff -u -r tramp/amp.f ../rayinvr_g77/tramp/amp.f
+--- tramp/amp.f	2000-05-20 14:40:56.000000000 -0600
++++ ../rayinvr_g77/tramp/amp.f	2003-11-18 16:35:22.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.3  Aug 1992
+ c
+@@ -553,7 +556,7 @@
+ c                 
+       implicit double precision (a-h,o-z)
+       real*4 x,y,dy,s,yy,yy1,yy2
+-      common /spln$/ ncount
++      common /splnS/ ncount
+       dimension x(n),y(n),dy(n),w(1)
+       dimension yy(1),yy1(1),yy2(1)
+       integer a,b,c,d,r,r1,r2,t,t1,u,v
+diff -u -r tramp/Makefile ../rayinvr_g77/tramp/Makefile
+--- tramp/Makefile	2000-05-20 14:40:56.000000000 -0600
++++ ../rayinvr_g77/tramp/Makefile	2003-11-18 16:34:44.000000000 -0700
+@@ -1,13 +1,16 @@
++#     File patched for g77 compilation
++#     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++#
+ #
+ # makefile for TRAMP
+ #
+-EXEDIR=/elmore/sunbin/
+-PLTLIB=/elmore/src/pltlib
++EXEDIR=../bin/
++PLTLIB=../pltlib/
+ #
+ # compile flags
+ #
+ FFLAGS =  -O
+-CFLAGS =  -O -I/usr/openwin/include
++CFLAGS =  -O
+ #
+ #rules for compiling .f files:
+ #
+@@ -29,12 +32,13 @@
+ #
+ tramp: $(TRAMP_EXEC)
+ $(TRAMP_EXEC): ${TRAMP_OBJS}
+-	unilink ${TRAMP_OBJS}
++#unilink ${TRAMP_OBJS}
++	f77 -o main ${TRAMP_OBJS}
+ 	mv main ${TRAMP_EXEC}
+ #
+ xtramp: $(XTRAMP_EXEC)
+ $(XTRAMP_EXEC): ${XTRAMP_OBJS}
+-	f77 -o main ${XTRAMP_OBJS} -L/usr/openwin/lib -lX11
++	f77 -o main ${XTRAMP_OBJS} -L/usr/lib/X11 -lX11
+ 	mv main ${XTRAMP_EXEC}
+ #
+ # dependencies
+diff -u -r tramp/plt.f ../rayinvr_g77/tramp/plt.f
+--- tramp/plt.f	2000-05-20 14:40:56.000000000 -0600
++++ ../rayinvr_g77/tramp/plt.f	2003-11-18 16:34:09.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.3  Aug 1992
+ c                 
+@@ -504,7 +507,7 @@
+ 10    continue    
+ c
+       if(istep.eq.1) write(6,5) anglew
+-5     format('take-off angle: ',f10.5$)
++5     format('take-off angle: ',f10.5)
+ c
+       if(irayps.ne.1) then
+         call line(x,z,npts)
+diff -u -r tramp/rngkta.f ../rayinvr_g77/tramp/rngkta.f
+--- tramp/rngkta.f	2000-05-20 14:40:56.000000000 -0600
++++ ../rayinvr_g77/tramp/rngkta.f	2003-11-18 16:35:05.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c                 
+ c     version 1.3  Aug 1992
+ c
+@@ -13,7 +16,7 @@
+       real y(2),f(2),t(2),s(2),g(2) 
+       logical*1 be,bh,br,bx 
+       logical bxx
+-      common /rkc$/ bxx
++      common /rkcS/ bxx
+ c                 
+       bh=.true.   
+       br=.true.   
+diff -u -r tramp/trc.f ../rayinvr_g77/tramp/trc.f
+--- tramp/trc.f	2000-05-20 14:40:56.000000000 -0600
++++ ../rayinvr_g77/tramp/trc.f	2003-11-18 16:34:24.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.3  Aug 1992
+ c     
+@@ -405,7 +408,7 @@
+       real y(2),f(2)
+       logical ok
+       include 'tramp.com'
+-      common /rkc$/ ok
++      common /rkcS/ ok
+ c 
+       f(1)=1./tan(y(2))
+       term1=c(layer,iblk,3)+c(layer,iblk,4)*x
+@@ -440,7 +443,7 @@
+       real y(2),f(2)
+       logical ok
+       include 'tramp.com'
+-      common /rkc$/ ok
++      common /rkcS/ ok
+ c 
+       f(1)=tan(y(2))
+       term1=c(layer,iblk,3)+c(layer,iblk,4)*y(1)
+diff -u -r vmodel/Makefile ../rayinvr_g77/vmodel/Makefile
+--- vmodel/Makefile	2000-05-20 14:40:57.000000000 -0600
++++ ../rayinvr_g77/vmodel/Makefile	2003-11-18 16:34:37.000000000 -0700
+@@ -1,13 +1,16 @@
++#     File patched for g77 compilation
++#     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++#
+ #
+ # makefile for VMODEL
+ #
+-EXEDIR=/net/ray/sunbin/
+-PLTLIB=/net/ray/src/pltlib
++EXEDIR=../bin/
++PLTLIB=../pltlib/
+ #
+ # compile flags
+ #
+ FFLAGS =  -O
+-CFLAGS =  -O -I/usr/openwin/include
++CFLAGS =  -O 
+ #
+ #rules for compiling .f files:
+ #
+@@ -29,12 +32,13 @@
+ #
+ vmodel: $(VMODEL_EXEC)
+ $(VMODEL_EXEC): ${VMODEL_OBJS}
+-	unilink ${VMODEL_OBJS} 
++#	unilink ${VMODEL_OBJS}
++	f77 -o main ${VMODEL_OBJS}
+ 	mv main ${VMODEL_EXEC}
+ #
+ xvmodel: $(XVMODEL_EXEC)
+ $(XVMODEL_EXEC): ${XVMODEL_OBJS}
+-	f77 -o main ${XVMODEL_OBJS} -L/usr/openwin/lib -lX11
++	f77 -o main ${XVMODEL_OBJS} -L/usr/lib/X11 -lX11
+ 	mv main ${XVMODEL_EXEC}
+ #
+ # dependencies
+diff -u -r vmodel/plt.f ../rayinvr_g77/vmodel/plt.f
+--- vmodel/plt.f	2000-05-20 14:40:57.000000000 -0600
++++ ../rayinvr_g77/vmodel/plt.f	2003-11-18 16:33:36.000000000 -0700
+@@ -1,3 +1,6 @@
++c     File patched for g77 compilation
++c     Scott Pearse / email: scott.pearse@gmail.com / web: http://www.linkedin.com/in/scottpearse
++c
+ c
+ c     version 1.2  Mar 1992
+ c                 
+@@ -207,7 +210,7 @@
+           read(30,755) (xfrefl(i),i=1,nfrefr)
+           read(30,755) (zfrefl(i),i=1,nfrefr)
+           read(30,765) 
+-755       format(3x,<nfrefr>f7.2)
++755       format(3x,1000000f7.2)
+ 765       format(' ')
+ c
+           ipen=3
+@@ -472,7 +475,7 @@
+           read(30,555) (xfrefl(i),i=1,nfrefr)
+           read(30,555) (zfrefl(i),i=1,nfrefr)
+           read(30,765)
+-555       format(3x,<nfrefr>f7.2)
++555       format(3x,1000000f7.2)
+ c
+           ipen=3
+           do 1010 ii=1,nfrefr

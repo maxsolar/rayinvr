@@ -1,0 +1,2419 @@
+Index: read.me.precision
+===================================================================
+--- read.me.precision	(revision 0)
++++ read.me.precision	(revision 1072)
+@@ -0,0 +1,35 @@
++This is a modified version of Rayinvr, with the G77 patch applied.
++
++The modifications include an increase of precision from 10 metres for depth
++nodes to 1 m.  Velocity nodes have been changed from 10 m/s precision to 1 m/s.
++This was done to allow greater accuracy for high resolution velocity analysis.
++
++The only changes made were to the format of input and output.  Here are the 
++changes made to main.f for rayinvr (lines 240 and 242, '-' is modified, '+' is original):
++-15       format(i2,1x,10f8.3)
+++15       format(i2,1x,10f7.2)
++-235      format(3x,10(6x,i2))
+++235      format(3x,10(5x,i2))
++
++Example 9 in the examples directory includes sample .in files with the new format, 
++and can be run the same as the other examples (the old examples will not work with 
++the new binaries).
++
++
++NOTE: The increase in precision has required a slight change to the v.in 
++velocity model format which is incompatible with the original v.in format. 
++The following programs have been modified to use this new precision (other 
++utilities will probably not work correctly):
++
++rayinvr/Xrayinvr
++vmodel/xvmodel
++dmplstsqr
++c2v/v2c (included in this directory)
++
++
++Also the maximum number of layers has been increased from 12 to 32.
++
++
++Chris LeBlanc
++Dalhousie University
++2005
+\ No newline at end of file
+Index: vmodel/vmodel.par
+===================================================================
+--- vmodel/vmodel.par	(revision 1071)
++++ vmodel/vmodel.par	(revision 1072)
+@@ -10,7 +10,7 @@
+ c
+       parameter (pi18=57.29577951)
+ c
+-      parameter(player=15, ppcntr=300, ppvel=300,
++      parameter(player=32, ppcntr=300, ppvel=300,
+      +          pnvp=101, ppnpts=500, ppfref=10, ppzff=20)
+ c
+       parameter(pncntr=player+1, pinvel=player*2)
+Index: vmodel/main.f
+===================================================================
+--- vmodel/main.f	(revision 1071)
++++ vmodel/main.f	(revision 1072)
+@@ -147,7 +147,7 @@
+ c
+       write(6,555) xmax
+       write(13,555) xmax
+-555   format('xmax = ',f7.2,' km')
++555   format('xmax = ',f8.3,' km')
+ c
+ c     assign values to the arrays nzint and nvint
+ c
+@@ -322,9 +322,9 @@
+          read(11,55,end=999) ilyr,(xm(icont,j),j=j1,j2)
+          read(11,55,end=999) icnt,(zm(icont,j),j=j1,j2)
+          read(11,65,end=99) (ivarz(icont,j),j=j1,j2)
+-55       format(i2,1x,10f7.2)
++55       format(i2,1x,10f8.3)
+ c65       format(3x,10i7)
+-65       format(3x,10(5x,i2))
++65       format(3x,10(6x,i2))
+          nrz=nrz+1
+          if(icnt.ne.1) go to 211
+          j1=j1+10
+@@ -438,7 +438,7 @@
+                   write(6,1195) xm(i,j+1),i
+                   write(13,1195) xm(i,j+1),i
+ 1195              format('***  nodes not specified left to right at ',
+-     +                   f7.2,' km for boundary ',i3,'  ***') 
++     +                   f8.3,' km for boundary ',i3,'  ***') 
+                   iflag=1
+                 else
+                   iflagw=1
+@@ -505,7 +505,7 @@
+                   write(13,2195) xvel(i,j+1,1),i
+ 2195              format(
+      +              '***  upper vel not specified left to right at ',
+-     +              f7.2,' km for layer ',i3,'  ***') 
++     +              f8.3,' km for layer ',i3,'  ***') 
+                   iflag=1
+                 else
+                   iflagw=1
+@@ -568,7 +568,7 @@
+                   write(13,2295) xvel(i,j+1,2),i
+ 2295              format(
+      +              '***  lower vel not specified left to right at ',
+-     +              f7.2,' km for layer ',i3,'  ***') 
++     +              f8.3,' km for layer ',i3,'  ***') 
+                   iflag=1
+                 else
+                   iflagw=1
+@@ -1323,12 +1323,12 @@
+                 write(6,8805) i,xa,va
+                 write(13,8805) i,xa,va
+ 8805            format('layer ',i3,' small upper velocity at ',
+-     +                  f7.2,' km (',f7.2,' km/s)')
++     +                  f8.3,' km (',f8.3,' km/s)')
+               else
+                 write(6,8815) i,xa,va
+                 write(13,8815) i,xa,va
+ 8815            format('layer ',i3,' large upper velocity at ',
+-     +                  f7.2,' km (',f7.2,' km/s)')
++     +                  f8.3,' km (',f8.3,' km/s)')
+               end if
+             end if
+ 8820     continue
+@@ -1366,12 +1366,12 @@
+                 write(6,9805) i,xb,vb
+                 write(13,9805) i,xb,vb
+ 9805            format('layer ',i3,' small lower velocity at ',
+-     +                  f7.2,' km (',f7.2,' km/s)')
++     +                  f8.3,' km (',f8.3,' km/s)')
+               else
+                 write(6,9815) i,xb,vb
+                 write(13,9815) i,xb,vb
+ 9815            format('layer ',i3,' large lower velocity at ',
+-     +                  f7.2,' km (',f7.2,' km/s)')
++     +                  f8.3,' km (',f8.3,' km/s)')
+               end if
+             end if
+ 9820     continue
+@@ -1406,7 +1406,7 @@
+                 write(6,705) i,i-1,xb
+                 write(13,705) i,i-1,xb
+ 705             format('***  boundary ',i3,' crosses boundary ',
+-     +                  i3,' at ',f7.2,' km  ***')
++     +                  i3,' at ',f8.3,' km  ***')
+                 go to 720
+               end if
+             end if
+@@ -1534,13 +1534,13 @@
+                 write(6,815) i,va,vb
+                 write(13,815) i,va,vb
+ 815             format('layer ',i3,' is low-velocity zone (',
+-     +                 f7.2,' over ',f7.2,' km/s)')
++     +                 f8.3,' over ',f8.3,' km/s)')
+                 go to 820
+               else
+                 write(6,805) i,xa,va,vb
+                 write(13,805) i,xa,va,vb
+ 805             format('layer ',i3,' is low-velocity zone at ',
+-     +                  f7.2,' km (',f7.2,' over ',f7.2,' km/s)')
++     +                  f8.3,' km (',f8.3,' over ',f8.3,' km/s)')
+                 go to 820
+               end if
+             end if
+@@ -1697,12 +1697,12 @@
+                 write(6,1815) i,va,vb
+                 write(13,1815) i,va,vb
+ 1815            format('layer ',i3,' has neg vert vel grad (',
+-     +                 f7.2,' over ',f7.2,' km/s)')
++     +                 f8.3,' over ',f8.3,' km/s)')
+               else
+                 write(6,1805) i,xa,va,vb
+                 write(13,1805) i,xa,va,vb
+ 1805            format('layer ',i3,' has neg vert vel grad at ',
+-     +                  f7.2,' km (',f7.2,' over ',f7.2,' km/s)')
++     +                  f8.3,' km (',f8.3,' over ',f8.3,' km/s)')
+               end if
+             end if
+ 1820     continue
+@@ -1778,8 +1778,8 @@
+               if(ds.gt.dsmax) then
+                 write(6,2325) i,ds,xm(i,j),xm(i,j+2)
+                 write(13,2325) i,ds,xm(i,j),xm(i,j+2)
+-2325            format('bnd ',i3,' has ',f7.2,
+-     +          ' deg slope change at ',f7.2,' - ',f7.2,' km')
++2325            format('bnd ',i3,' has ',f8.3,
++     +          ' deg slope change at ',f8.3,' - ',f8.3,' km')
+               end if
+               if(ds.gt.dslope(i)) then
+                 dslope(i)=ds
+@@ -1876,7 +1876,7 @@
+                 write(6,3805) i,xa,gradx
+                 write(13,3805) i,xa,gradx
+ 3805            format('layer ',i3,' has large vert vel grad at ',
+-     +                  f7.2,' km (',f10.3,' km/s/km)')
++     +                  f8.3,' km (',f10.3,' km/s/km)')
+               end if
+             end if
+             if(abs(gradx).gt.dvv(i)) then
+@@ -2036,7 +2036,7 @@
+                 write(6,5805) i,gradl,xa1,xa2
+                 write(13,5805) i,gradl,xa1,xa2
+ 5805            format('layer ',i3,' large lat upper vel grad of ',
+-     +                  f7.4,' km/s/km at ',f7.2,' - ',f7.2,' km')
++     +                  f7.4,' km/s/km at ',f8.3,' - ',f8.3,' km')
+               end if
+               if(gradl.gt.dlv(i,1)) then
+                 dlv(i,1)=gradl
+@@ -2098,7 +2098,7 @@
+                 write(6,5815) i,gradl,xb1,xb2
+                 write(13,5815) i,gradl,xb1,xb2
+ 5815            format('layer ',i3,' large lat lower vel grad of ',
+-     +                  f7.4,' km/s/km at ',f7.2,' - ',f7.2,' km')
++     +                  f7.4,' km/s/km at ',f8.3,' - ',f8.3,' km')
+               end if
+               if(gradl.gt.dlv(i,2)) then
+                 dlv(i,2)=gradl
+Index: rayinvr/main.f
+===================================================================
+--- rayinvr/main.f	(revision 1071)
++++ rayinvr/main.f	(revision 1072)
+@@ -237,9 +237,9 @@
+          read(iunit,15,end=999) ilyr,(xm(icont,j),j=j1,j2)
+          read(iunit,15,end=999) icnt,(zm(icont,j),j=j1,j2)
+          read(iunit,235,end=99) (ivarz(icont,j),j=j1,j2)
+-15       format(i2,1x,10f7.2)
++15       format(i2,1x,10f8.3)
+ c235      format(3x,10i7)
+-235      format(3x,10(5x,i2))
++235      format(3x,10(6x,i2))
+          nrz=nrz+1
+          if(icnt.ne.1) go to 211
+          j1=j1+10
+Index: rayinvr/rayinvr.par
+===================================================================
+--- rayinvr/rayinvr.par	(revision 1071)
++++ rayinvr/rayinvr.par	(revision 1072)
+@@ -14,7 +14,7 @@
+       parameter(pi=3.141592654,  pi4=.785398163,   pi2=1.570796327,
+      +          pi34=2.35619449, pi18=57.29577951, pit2=-6.283185307)
+ c
+-      parameter(player=12, ppcntr=300,  ptrap=300,   pshot=200,
++      parameter(player=32, ppcntr=300,  ptrap=300,   pshot=200,
+      +          prayf=30, ptrayf=3000, ppray=500,  pnrayf=1000,
+      +          pray=100000, prefl=20,   preflt=150, pconv=10,
+      +          pconvt=100, pnsmth=500, papois=50, pnvar=400,
+Index: misc/v2c.com
+===================================================================
+--- misc/v2c.com	(revision 0)
++++ misc/v2c.com	(revision 1072)
+@@ -0,0 +1,18 @@
++      integer nblk(player),ivarv(player,ppvel,2),
++     +        nzed(pncntr),ivarz(player,ppcntr),
++     +        ivg(player,ptrap),
++     +        nvel(player,2)
++      real*4 c(player,ptrap,11),s(player,ptrap,2),b(player,ptrap,2),
++     +       vm(player,ptrap,4),xbnd(player,ptrap,2),
++     +       xm(pncntr,ppcntr),zm(pncntr,ppcntr),
++     +       vf(player,ppvel,2),
++     +       xvel(player,ppvel,2),
++     +       velgrd(pxgrid,pzgrid)
++c
++      common /blk1/ layer,iblk
++      common /blk2/ c,ivg
++      common /blk3/ s,b,vm
++      common /blk4/ xbnd,nblk,nlayer
++      common /blk5/ xm,zm,vf,nzed,nvel,xvel
++      common /blk13/ nxg,nzg,dxg,dzg,velgrd
++c
+Index: misc/v2c.par
+===================================================================
+--- misc/v2c.par	(revision 0)
++++ misc/v2c.par	(revision 1072)
+@@ -0,0 +1,26 @@
++c
++c     ----------------------------------------------------------------
++c
++      integer player,ppcntr,ptrap,ppvel,pncntr,pxgrid,pzgrid,
++     &	pinvel
++c
++      parameter(player=50, ppcntr=100,  ptrap=400,
++     +          ppvel=200,pxgrid=3201,pzgrid=1001)
++c
++      parameter(pncntr=player+1, pinvel=player*2)
++c
++c     player - model layers
++c
++c     ppcntr - points defining a single model layer
++c              (must be a multiple of 10)
++c
++c     ppvel - points at which upper and lower layer velocities defined
++c             (must be a multiple of 10)
++c
++c     ptrap - trapezoids with a layer
++c
++c     pxgrid - number of grid points in x-direction for output of 
++c              uniformly sampled velocity mdoel
++c
++c     pzgrid - number of grid points in z-direction for output of 
++c             uniformly sampled velocity mdoel
+Index: misc/rayinvr.par
+===================================================================
+--- misc/rayinvr.par	(revision 1071)
++++ misc/rayinvr.par	(revision 1072)
+@@ -14,7 +14,7 @@
+       parameter(pi=3.141592654,  pi4=.785398163,   pi2=1.570796327,
+      +          pi34=2.35619449, pi18=57.29577951, pit2=-6.283185307)
+ c
+-      parameter(player=12, ppcntr=300,  ptrap=300,   pshot=200,
++      parameter(player=32, ppcntr=300,  ptrap=300,   pshot=200,
+      +          prayf=20, ptrayf=750, ppray=500,  pnrayf=500,
+      +          pray=100000, prefl=20,   preflt=150, pconv=10,
+      +          pconvt=100, pnsmth=500, papois=50, pnvar=400,
+Index: misc/v2c.f
+===================================================================
+--- misc/v2c.f	(revision 0)
++++ misc/v2c.f	(revision 1072)
+@@ -0,0 +1,736 @@
++      program c2v
++c-----------------------------------------------------------------------
++c Convert rayinvr v.in-formatted velocity model to a column-oriented 
++c "c.in" velocity model. Use "c2v" to convert from column-oriented
++c file to a rayinvr v.in-formatted file.
++c-----------------------------------------------------------------------
++      include 'v2c.par'
++      include 'v2c.com'
++      character*130 ifile,ofile
++      common /ivar/ ivarv,ivarz
++      data nzed/pncntr*1/,nvel/pinvel*1/
++c-----------------------------------------------------------------------
++      write(*,*) 'Enter input file name [<return> for "v.in"]'
++      read(*,1030) ifile
++ 1030 format(a130)
++      if(ifile.eq.'') ifile='v.in'
++      write(*,*) 'Enter output file name [<return> for "c.in"]'
++      read(*,1030) ofile
++      if(ofile.eq.'') ofile='c.in'
++      open(7,file=ofile,status='unknown')
++      open(8,file=ifile,status='old')
++c-----------------------------------------------------------------------
++c Get xmin and xmax from v.in  
++
++      call xminmax(ncont,xmin,xmax)
++      if(xmin.eq.xmax) then
++         xmin=0.
++      end if
++      write(*,*) 'xmin,xmax = ',xmin,xmax
++      call readv(ncont,irec)
++      call calmod(ncont,xmin,xmax)
++
++c Write out boundaries
++
++      do i=1,nlayer+1
++         write(7,11) i
++ 11      format('B',1x,i2)
++         j=1
++ 10      continue
++         write(7,12) xm(i,j),zm(i,j),ivarz(i,j)
++ 12      format(f8.3,f8.3,1x,i2)
++         if(xm(i,j+1).gt.xm(i,j)) then
++            j=j+1
++            goto 10
++         end if
++      end do
++
++c Write out velocities
++
++      do i=1,nlayer
++         write(7,13) i
++ 13      format('V',1x,i2)
++         j1=1
++         j2=1
++ 20      continue
++         if(xvel(i,j1,1).eq.xvel(i,j2,2)) then
++            write(7,14) xvel(i,j1,1),vf(i,j1,1),ivarv(i,j1,1),
++     &           vf(i,j2,2),ivarv(i,j2,2)
++            if(xvel(i,j1+1,1).gt.xvel(i,j1,1).or.
++     &           xvel(i,j2+1,2).gt.xvel(i,j2,2)) then
++               if(xvel(i,j1+1,1).gt.xvel(i,j1,1)) then
++                  j1=j1+1
++               end if
++               if(xvel(i,j2+1,2).gt.xvel(i,j2,2)) then
++                  j2=j2+1
++               end if
++               goto 20
++            end if
++         elseif(xvel(i,j1,1).lt.xvel(i,j2,2)) then
++            write(7,14) xvel(i,j1,1),vf(i,j1,1),ivarv(i,j1,1),0,0
++            if(xvel(i,j1+1,1).gt.xvel(i,j1,1)) then
++               j1=j1+1
++               goto 20
++            end if
++         elseif(xvel(i,j1,1).gt.xvel(i,j2,2)) then
++            write(7,14) xvel(i,j2,2),0,0,vf(i,j2,2),ivarv(i,j2,2)
++            if(xvel(i,j2+1,2).gt.xvel(i,j2,2)) then
++               j2=j2+1
++               goto 20
++            end if
++         end if
++ 14      format(f8.3,f8.3,1x,i2,f8.3,1x,i2)
++      end do
++
++      close(8)
++
++      stop
++      end
++
++c
++c     ----------------------------------------------------------------
++c
++      subroutine xminmax(ncont,xmin,xmax)
++c
++      include 'v2c.par'
++      include 'v2c.com'
++c
++c Read in rayinvr v.in file
++c
++      xmin=9.e10
++      xmax=-9.e10
++      ncont=1
++      nrzmax=ppcntr/10
++      nrvmax=ppvel/10
++      do 202 icont=1,player+1
++         nrz=1
++         j1=1
++         j2=10
++11       if(nrz.gt.nrzmax) go to 211
++         read(8,15,end=999) ilyr,(xm(icont,j),j=j1,j2)
++         read(8,15,end=999) icnt,(zm(icont,j),j=j1,j2)
++         read(8,245,end=99) 
++15       format(i2,1x,10f8.3)
++245      format(' ')
++         nrz=nrz+1
++         if(icnt.ne.1) go to 211
++         j1=j1+10
++         j2=j2+10
++         go to 11
++211      continue
++         xmin=min(xmin,xm(icont,1))
++         xmax=max(xmax,xm(icont,1))
++         do j=2,j2
++            if(xm(icont,j).gt.xm(icont,j-1)) then
++               xmax=max(xmax,xm(icont,j))
++            end if
++         end do
++
++         nrv=1
++         j1=1
++         j2=10
++21       if(nrv.gt.nrvmax) go to 311
++         read(8,15,end=999) ilyr,(xvel(icont,j,1),j=j1,j2)
++         read(8,15,end=999) icnt,(vf(icont,j,1),j=j1,j2)
++         read(8,245,end=999) 
++         nrv=nrv+1
++         if(icnt.ne.1) go to 311
++         j1=j1+10
++         j2=j2+10
++         go to 21
++311      continue
++
++         nrv=1
++         j1=1
++         j2=10
++31       if(nrv.gt.nrvmax) go to 411
++         read(8,15,end=999) ilyr,(xvel(icont,j,2),j=j1,j2)
++         read(8,15,end=999) icnt,(vf(icont,j,2),j=j1,j2)
++         read(8,245,end=999) 
++         nrv=nrv+1
++         if(icnt.ne.1) go to 411
++         j1=j1+10
++         j2=j2+10
++         go to 31
++411      continue
++         ncont=ncont+1
++ 202     continue    
++c                 
++99    nlayer=ncont-1
++      rewind(8)
++      return
++ 999  continue
++      write(*,*) '* ERROR in FORTRAN routine xminmax'
++      return
++      end
++
++c
++c     ----------------------------------------------------------------
++c
++      subroutine readv(ncont,irec)
++c
++      include 'v2c.par'
++      include 'v2c.com'
++      common /ivar/ ivarv,ivarz
++c
++c Read in rayinvr v.in file
++c
++      irec=3
++      ncont=1
++      nrzmax=ppcntr/10
++      nrvmax=ppvel/10
++      do 202 icont=1,player+1
++         nrz=1
++         j1=1
++         j2=10
++11       if(nrz.gt.nrzmax) go to 211
++         read(8,15,end=999) ilyr,(xm(icont,j),j=j1,j2)
++         read(8,15,end=999) icnt,(zm(icont,j),j=j1,j2)
++         read(8,235,end=99) (ivarz(icont,j),j=j1,j2)
++15       format(i2,1x,10f8.3)
++235      format(3x,10i8)
++         nrz=nrz+1
++         if(icnt.ne.1) go to 211
++         j1=j1+10
++         j2=j2+10
++         go to 11
++211      continue
++         irec=irec+1
++         nrv=1
++         j1=1
++         j2=10
++21       if(nrv.gt.nrvmax) go to 311
++         read(8,15,end=999) ilyr,(xvel(icont,j,1),j=j1,j2)
++         read(8,15,end=999) icnt,(vf(icont,j,1),j=j1,j2)
++         read(8,235,end=999) (ivarv(icont,j,1),j=j1,j2)
++         nrv=nrv+1
++         if(icnt.ne.1) go to 311
++         j1=j1+10
++         j2=j2+10
++         go to 21
++311      continue
++         irec=irec+1
++         nrv=1
++         j1=1
++         j2=10
++31       if(nrv.gt.nrvmax) go to 411
++         read(8,15,end=999) ilyr,(xvel(icont,j,2),j=j1,j2)
++         read(8,15,end=999) icnt,(vf(icont,j,2),j=j1,j2)
++         read(8,235,end=999) (ivarv(icont,j,2),j=j1,j2)
++         nrv=nrv+1
++         if(icnt.ne.1) go to 411
++         j1=j1+10
++         j2=j2+10
++         go to 31
++411      continue
++         irec=irec+1
++         ncont=ncont+1
++ 202     continue    
++c                 
++99    nlayer=ncont-1
++      
++
++      return
++ 999  continue
++      write(*,*) '* ERROR in FORTRAN routine ridumppar'
++      return
++      end
++
++c
++c     ----------------------------------------------------------------
++c
++c     version 1.3  Aug 1992
++c
++      subroutine calmod(ncont,xmin,xmax)
++c
++c     calculate model parameters now for use later in program
++c
++c
++      include 'v2c.par'
++      real xa(2*(ppcntr+ppvel))
++      include 'v2c.com'
++
++      do i=1,player
++         do j=1,ptrap
++            do k=1,4
++               vm(i,j,k)=0.
++            end do
++         end do
++      end do
++
++c
++      do 10 i=1,ncont
++         nzed(i)=1
++         do 20 j=1,ppcntr
++            if(abs(xm(i,j)-xmax).lt..0001) go to 30
++            nzed(i)=nzed(i)+1
++20       continue
++30       if(nzed(i).gt.1) then
++           do 40 j=1,nzed(i)-1
++              if(xm(i,j).ge.xm(i,j+1)) go to 999
++40         continue
++           if(abs(xm(i,1)-xmin).gt..001.or.
++     +        abs(xm(i,nzed(i))-xmax).gt..001) go to 999
++         else
++            xm(i,1)=xmax
++         end if
++10    continue
++      do 11 i=1,nlayer
++         nvel(i,1)=1
++         do 21 j=1,ppvel
++            if(abs(xvel(i,j,1)-xmax).lt..0001) go to 31
++            nvel(i,1)=nvel(i,1)+1
++21       continue
++31       if(nvel(i,1).gt.1) then
++           do 41 j=1,nvel(i,1)-1
++              if(xvel(i,j,1).ge.xvel(i,j+1,1)) go to 999
++41         continue
++           if(abs(xvel(i,1,1)-xmin).gt..001.or.abs(xvel(i,nvel(i,1),1)-
++     +        xmax).gt..001) go to 999
++         else
++           if(vf(i,1,1).gt.0.) then
++             xvel(i,1,1)=xmax
++           else
++             if(i.eq.1) then
++               go to 999
++             else
++               nvel(i,1)=0
++             end if
++           end if
++         end if
++11    continue
++      do 12 i=1,nlayer
++         nvel(i,2)=1
++         do 22 j=1,ppvel
++            if(abs(xvel(i,j,2)-xmax).lt..0001) go to 32
++            nvel(i,2)=nvel(i,2)+1
++22       continue
++32       if(nvel(i,2).gt.1) then
++           do 42 j=1,nvel(i,2)-1
++              if(xvel(i,j,2).ge.xvel(i,j+1,2)) go to 999
++42         continue
++           if(abs(xvel(i,1,2)-xmin).gt..001.or.abs(xvel(i,nvel(i,2),2)-
++     +        xmax).gt..001) go to 999
++         else
++           if(vf(i,1,2).gt.0.) then
++             xvel(i,1,2)=xmax
++           else
++             nvel(i,2)=0
++           end if
++         end if
++12    continue
++c
++      do 50 i=1,nlayer
++         xa(1)=xmin
++         xa(2)=xmax
++         ib=2
++         ih=ib
++         do 60 j=1,nzed(i)
++            do 61 k=1,ih
++               if(abs(xm(i,j)-xa(k)).lt..005) go to 60
++61          continue
++            ib=ib+1
++            xa(ib)=xm(i,j)
++60       continue
++         ih=ib
++         do 70 j=1,nzed(i+1)
++            do 80 k=1,ih
++               if(abs(xm(i+1,j)-xa(k)).lt..005) go to 70
++80          continue
++            ib=ib+1
++            xa(ib)=xm(i+1,j)
++70       continue
++         ih=ib
++         if(nvel(i,1).gt.0) then
++           il=i
++           is=1
++         else
++           if(nvel(i-1,2).gt.0) then
++             il=i-1
++             is=2
++           else
++             il=i-1
++             is=1
++           end if
++         end if
++         do 71 j=1,nvel(il,is)
++            do 81 k=1,ih
++               if(abs(xvel(il,j,is)-xa(k)).lt..005) go to 71
++81          continue
++            ib=ib+1
++            xa(ib)=xvel(il,j,is)
++71       continue
++         if(nvel(i,2).gt.0) then
++           ih=ib
++           do 72 j=1,nvel(i,2)
++              do 82 k=1,ih
++                 if(abs(xvel(i,j,2)-xa(k)).lt..005) go to 72
++82            continue
++              ib=ib+1
++              xa(ib)=xvel(i,j,2)
++72         continue
++         end if
++c
++         if(ib.gt.(ptrap+1)) then
++           write(6,5) i
++5          format(/'***  maximum number of blocks in layer ',
++     +       i2,' exceeded  ***'/)
++           write(*,*) '    number of blocks requested = ',ib
++           return
++         end if
++c
++         call sort(xa,ib)
++c
++         nblk(i)=ib-1
++         do 90 j=1,nblk(i)
++            xbnd(i,j,1)=xa(j)
++            xbnd(i,j,2)=xa(j+1)
++90       continue
++c
++50    continue
++c
++c     calculate slopes and intercepts of each block boundary
++c
++      do 100 i=1,nlayer
++         do 110 j=1,nblk(i)
++            xbndc=xbnd(i,j,1)+.001
++            if(nzed(i).gt.1) then
++              do 120 k=1,nzed(i)-1
++                 if(xbndc.ge.xm(i,k).and.xbndc.le.xm(i,k+1)) then
++                   dx=xm(i,k+1)-xm(i,k)
++                   c1=(xm(i,k+1)-xbnd(i,j,1))/dx
++                   c2=(xbnd(i,j,1)-xm(i,k))/dx
++                   z1=c1*zm(i,k)+c2*zm(i,k+1)
++                   c1=(xm(i,k+1)-xbnd(i,j,2))/dx
++                   c2=(xbnd(i,j,2)-xm(i,k))/dx
++                   z2=c1*zm(i,k)+c2*zm(i,k+1)
++                   go to 130
++                 end if
++  120         continue
++            else
++              z1=zm(i,1)
++              z2=zm(i,1) 
++            end if
++130         s(i,j,1)=(z2-z1)/(xbnd(i,j,2)-xbnd(i,j,1))
++            b(i,j,1)=z1-s(i,j,1)*xbnd(i,j,1)
++            if(nzed(i+1).gt.1) then
++              do 140 k=1,nzed(i+1)-1
++                 if(xbndc.ge.xm(i+1,k).and.xbndc.le.
++     +             xm(i+1,k+1)) then
++                   dx=xm(i+1,k+1)-xm(i+1,k)
++                   c1=(xm(i+1,k+1)-xbnd(i,j,1))/dx
++                   c2=(xbnd(i,j,1)-xm(i+1,k))/dx
++                   z3=c1*zm(i+1,k)+c2*zm(i+1,k+1)
++                   c1=(xm(i+1,k+1)-xbnd(i,j,2))/dx
++                   c2=(xbnd(i,j,2)-xm(i+1,k))/dx
++                   z4=c1*zm(i+1,k)+c2*zm(i+1,k+1)
++                   go to 150
++                 end if
++140           continue
++            else
++              z3=zm(i+1,1)
++              z4=zm(i+1,1) 
++            end if
++150         s(i,j,2)=(z4-z3)/(xbnd(i,j,2)-xbnd(i,j,1))
++            b(i,j,2)=z3-s(i,j,2)*xbnd(i,j,1)
++c                 
++c           check for layer pinchouts 
++c                 
++            ivg(i,j)=1
++            if(abs(z3-z1).lt..0005) ivg(i,j)=2 
++            if(abs(z4-z2).lt..0005) ivg(i,j)=3 
++            if(abs(z3-z1).lt..0005.and.abs(z4-z2).lt..0005) ivg(i,j)=-1
++c
++110      continue 
++100   continue    
++c
++c     assign velocities to each model block
++c
++      do 160 i=1,nlayer 
++c
++         if(nvel(i,1).eq.0) then
++           do 161 j=i-1,1,-1
++              if(nvel(j,2).gt.0) then
++                ig=j
++                jg=2
++                n1g=nvel(j,2)
++                go to 162
++              end if
++              if(nvel(j,1).gt.0) then
++                ig=j
++                jg=1
++                n1g=nvel(j,1)
++                go to 162
++              end if
++161        continue
++         else
++           ig=i
++           jg=1
++           n1g=nvel(i,1)
++         end if
++c
++162      if(n1g.gt.1.and.nvel(i,2).gt.1) ivcase=1
++         if(n1g.gt.1.and.nvel(i,2).eq.1) ivcase=2
++         if(n1g.eq.1.and.nvel(i,2).gt.1) ivcase=3
++         if(n1g.eq.1.and.nvel(i,2).eq.1) ivcase=4
++         if(n1g.gt.1.and.nvel(i,2).eq.0) ivcase=5
++         if(n1g.eq.1.and.nvel(i,2).eq.0) ivcase=6
++c
++         do 170 j=1,nblk(i)
++c
++            if(ivg(i,j).eq.-1) go to 170
++c
++            xbndcl=xbnd(i,j,1)+.001
++            xbndcr=xbnd(i,j,2)-.001
++c
++            go to (1001,1002,1003,1004,1005,1006), ivcase
++c
++1001        do 180 k=1,n1g-1
++               if(xbndcl.ge.xvel(ig,k,jg).and.xbndcl.le.xvel(ig,k+1,jg)) 
++     +              then
++                  dxx=xvel(ig,k+1,jg)-xvel(ig,k,jg)
++                  c1=xvel(ig,k+1,jg)-xbnd(i,j,1)
++                  c2=xbnd(i,j,1)-xvel(ig,k,jg)
++                  vm(i,j,1)=(c1*vf(ig,k,jg)+c2*vf(ig,k+1,jg))/dxx
++                  if(ig.ne.i) vm(i,j,1)=vm(i,j,1)+.001
++                  go to 1811
++               end if
++ 180        continue
++c
++1811        do 1812 k=1,n1g-1
++               if(xbndcr.ge.xvel(ig,k,jg).and.xbndcr.le.xvel(ig,k+1,jg)) 
++     +           then
++                 dxx=xvel(ig,k+1,jg)-xvel(ig,k,jg)
++                 c1=xvel(ig,k+1,jg)-xbnd(i,j,2)
++                 c2=xbnd(i,j,2)-xvel(ig,k,jg)
++                 vm(i,j,2)=(c1*vf(ig,k,jg)+c2*vf(ig,k+1,jg))/dxx
++                 if(ig.ne.i) vm(i,j,2)=vm(i,j,2)+.001
++                 go to 181
++               end if
++1812        continue
++c
++181         do 182 k=1,nvel(i,2)-1
++               if(xbndcl.ge.xvel(i,k,2).and.xbndcl.le.xvel(i,k+1,2)) 
++     +           then
++                 dxx=xvel(i,k+1,2)-xvel(i,k,2)   
++                 c1=xvel(i,k+1,2)-xbnd(i,j,1)
++                 c2=xbnd(i,j,1)-xvel(i,k,2)
++                 if(ivg(i,j).ne.2) then
++                   vm(i,j,3)=(c1*vf(i,k,2)+c2*vf(i,k+1,2))/dxx
++                 else
++                   vm(i,j,3)=vm(i,j,1)
++                 end if 
++                 go to 187
++               end if
++182         continue
++c
++187         do 1822 k=1,nvel(i,2)-1
++               if(xbndcr.ge.xvel(i,k,2).and.xbndcr.le.xvel(i,k+1,2)) 
++     +           then
++                 dxx=xvel(i,k+1,2)-xvel(i,k,2)   
++                 c1=xvel(i,k+1,2)-xbnd(i,j,2)
++                 c2=xbnd(i,j,2)-xvel(i,k,2)
++                 if(ivg(i,j).ne.3) then
++                   vm(i,j,4)=(c1*vf(i,k,2)+c2*vf(i,k+1,2))/dxx
++                 else
++                   vm(i,j,4)=vm(i,j,2) 
++                 end if
++                 go to 171
++               end if
++1822        continue
++c    
++1002        do 183 k=1,n1g-1
++               if(xbndcl.ge.xvel(ig,k,jg).and.xbndcl.le.xvel(ig,k+1,jg)) 
++     +           then
++                 dxx=xvel(ig,k+1,jg)-xvel(ig,k,jg)   
++                 c1=xvel(ig,k+1,jg)-xbnd(i,j,1)
++                 c2=xbnd(i,j,1)-xvel(ig,k,jg)
++                 vm(i,j,1)=(c1*vf(ig,k,jg)+c2*vf(ig,k+1,jg))/dxx
++                 if(ig.ne.i) vm(i,j,1)=vm(i,j,1)+.001
++                 go to 1833
++               end if
++183         continue
++c
++1833        do 1832 k=1,n1g-1
++               if(xbndcr.ge.xvel(ig,k,jg).and.xbndcr.le.xvel(ig,k+1,jg)) 
++     +           then
++                 dxx=xvel(ig,k+1,jg)-xvel(ig,k,jg)   
++                 c1=xvel(ig,k+1,jg)-xbnd(i,j,2)
++                 c2=xbnd(i,j,2)-xvel(ig,k,jg)
++                 vm(i,j,2)=(c1*vf(ig,k,jg)+c2*vf(ig,k+1,jg))/dxx
++                 if(ig.ne.i) vm(i,j,2)=vm(i,j,2)+.001
++                 go to 184
++               end if
++1832        continue
++c
++184         vm(i,j,3)=vf(i,1,2)
++            if(ivg(i,j).eq.2) vm(i,j,3)=vm(i,j,1)
++            vm(i,j,4)=vf(i,1,2)
++            if(ivg(i,j).eq.3) vm(i,j,4)=vm(i,j,2)
++            go to 171
++c
++1003        vm(i,j,1)=vf(ig,1,jg)
++            vm(i,j,2)=vf(ig,1,jg)
++            if(ig.ne.i) then
++              vm(i,j,1)=vm(i,j,1)+.001
++              vm(i,j,2)=vm(i,j,2)+.001
++            end if
++c
++            do 185 k=1,nvel(i,2)-1
++               if(xbndcl.ge.xvel(i,k,2).and.xbndcl.le.xvel(i,k+1,2)) 
++     +           then
++                 dxx=xvel(i,k+1,2)-xvel(i,k,2)   
++                 c1=xvel(i,k+1,2)-xbnd(i,j,1)
++                 c2=xbnd(i,j,1)-xvel(i,k,2)
++                 if(ivg(i,j).ne.2) then
++                   vm(i,j,3)=(c1*vf(i,k,2)+c2*vf(i,k+1,2))/dxx
++                 else
++                   vm(i,j,3)=vm(i,j,1)
++                 end if
++                 go to 188
++               end if
++185         continue
++c
++188         do 1851 k=1,nvel(i,2)-1
++               if(xbndcr.ge.xvel(i,k,2).and.xbndcr.le.xvel(i,k+1,2)) 
++     +           then
++                 dxx=xvel(i,k+1,2)-xvel(i,k,2)   
++                 c1=xvel(i,k+1,2)-xbnd(i,j,2)
++                 c2=xbnd(i,j,2)-xvel(i,k,2)
++                 if(ivg(i,j).ne.3) then
++                   vm(i,j,4)=(c1*vf(i,k,2)+c2*vf(i,k+1,2))/dxx
++                 else
++                   vm(i,j,4)=vm(i,j,2)
++                 end if
++                 go to 171
++               end if
++1851        continue
++c
++1004        vm(i,j,1)=vf(ig,1,jg)
++            vm(i,j,2)=vf(ig,1,jg) 
++            if(ig.ne.i) then
++              vm(i,j,1)=vm(i,j,1)+.001
++              vm(i,j,2)=vm(i,j,2)+.001
++            end if
++c
++            vm(i,j,3)=vf(i,1,2)
++            if(ivg(i,j).eq.2) vm(i,j,3)=vm(i,j,1)
++            vm(i,j,4)=vf(i,1,2)
++            if(ivg(i,j).eq.3) vm(i,j,4)=vm(i,j,2)
++            go to 171
++c
++1005        do 186 k=1,n1g-1
++               if(xbndcl.ge.xvel(ig,k,jg).and.xbndcl.le.xvel(ig,k+1,jg)) 
++     +           then
++                 dxx=xvel(ig,k+1,jg)-xvel(ig,k,jg)   
++                 c1=xvel(ig,k+1,jg)-xbnd(i,j,1)
++                 c2=xbnd(i,j,1)-xvel(ig,k,jg)
++                 vm(i,j,1)=(c1*vf(ig,k,jg)+c2*vf(ig,k+1,jg))/dxx
++                 if(ig.ne.i) vm(i,j,1)=vm(i,j,1)+.001
++                 vm(i,j,3)=vm(i,j,1)
++                 go to 1861
++               end if
++186         continue
++c
++1861        do 1862 k=1,n1g-1
++               if(xbndcr.ge.xvel(ig,k,jg).and.xbndcr.le.xvel(ig,k+1,jg)) 
++     +           then
++                 dxx=xvel(ig,k+1,jg)-xvel(ig,k,jg)   
++                 c1=xvel(ig,k+1,jg)-xbnd(i,j,2)
++                 c2=xbnd(i,j,2)-xvel(ig,k,jg)
++                 vm(i,j,2)=(c1*vf(ig,k,jg)+c2*vf(ig,k+1,jg))/dxx
++                 if(ig.ne.i) vm(i,j,2)=vm(i,j,2)+.001
++                 vm(i,j,4)=vm(i,j,2)                        
++                 go to 171
++               end if
++1862        continue
++c
++1006        vm(i,j,1)=vf(ig,1,jg)
++            if(ig.ne.i) vm(i,j,1)=vm(i,j,1)+.001
++            vm(i,j,2)=vm(i,j,1) 
++            vm(i,j,3)=vm(i,j,1)
++            vm(i,j,4)=vm(i,j,1) 
++c
++c           calculate velocity coefficients
++c
++171         s1=s(i,j,1)
++            s2=s(i,j,2)
++            b1=b(i,j,1)
++            b2=b(i,j,2)
++            xb1=xbnd(i,j,1)
++            xb2=xbnd(i,j,2)
++            if(ivg(i,j).eq.2) then
++              z3=s(i,j,2)*xb1+b(i,j,2)+.001
++              z4=s(i,j,2)*xb2+b(i,j,2)
++              s2=(z4-z3)/(xb2-xb1)
++              b2=z3-s2*xb1
++            end if
++            if(ivg(i,j).eq.3) then
++              z3=s(i,j,2)*xb1+b(i,j,2)
++              z4=s(i,j,2)*xb2+b(i,j,2)+.001
++              s2=(z4-z3)/(xb2-xb1)
++              b2=z3-s2*xb1
++            end if
++            v1=vm(i,j,1)
++            v2=vm(i,j,2)
++            v3=vm(i,j,3)
++            v4=vm(i,j,4)
++c
++            c(i,j,1)=s2*(xb2*v1-xb1*v2)+b2*(v2-v1)-
++     +               s1*(xb2*v3-xb1*v4)-b1*(v4-v3)       
++            c(i,j,2)=s2*(v2-v1)-s1*(v4-v3)
++            c(i,j,3)=-xb2*v1+xb1*v2+xb2*v3-xb1*v4
++            c(i,j,4)=-v2+v1+v4-v3
++            c(i,j,5)=b2*(xb2*v1-xb1*v2)-b1*(xb2*v3-xb1*v4)
++            c(i,j,6)=(s2-s1)*(xb2-xb1)
++            c(i,j,7)=(b2-b1)*(xb2-xb1)
++            c(i,j,8)=2.*c(i,j,2)*c(i,j,7)
++            c(i,j,9)=c(i,j,2)*c(i,j,6)
++            c(i,j,10)=c(i,j,4)*c(i,j,7)-c(i,j,3)*c(i,j,6)
++            c(i,j,11)=c(i,j,1)*c(i,j,7)-c(i,j,5)*c(i,j,6)
++c
++            if(ivg(i,j).eq.-1) then
++              vm(i,j,1)=0.
++              vm(i,j,2)=0.
++              vm(i,j,3)=0.
++              vm(i,j,4)=0.
++              do 172 k=1,11
++                 c(i,j,1)=0.
++172           continue
++            end if
++            if(abs(vm(i,j,1)-vm(i,j,2)).le..001.and.abs(vm(i,j,2)-
++     +        vm(i,j,3)).le..001.and.abs(vm(i,j,3)-vm(i,j,4)).le..001. 
++     +        and.ivg(i,j).ne.-1) ivg(i,j)=0
++c
++170      continue
++160   continue    
++c                 
++      return      
++c                 
++999   write(6,900)
++900   format(/'***  error in velocity model  ***'/)
++      return
++      end         
++c                 
++c     ----------------------------------------------------------------
++c                 
++      subroutine sort(x,npts)
++c                 
++c     sort the elements of array x in order of increasing size using
++c     a bubble sort technique
++c                 
++      real x(1) 
++      do 10 i=1,npts-1
++         iflag=0  
++         do 20 j=1,npts-1
++            if(x(j).gt.x(j+1)) then
++              iflag=1
++              xh=x(j)
++              x(j)=x(j+1)
++              x(j+1)=xh
++            end if
++20       continue 
++         if(iflag.eq.0) return
++10     continue   
++      return      
++      end         
+Index: misc/c2v.f
+===================================================================
+--- misc/c2v.f	(revision 0)
++++ misc/c2v.f	(revision 1072)
+@@ -0,0 +1,221 @@
++      program c2v
++c-----------------------------------------------------------------------
++c Convert a column-oriented "c.in" velocity model into a rayinvr 
++c v.in-formatted velocity model. Use "v2c" to convert from a rayinvr
++c v.in-formatted file to a column-formatted file.
++c-----------------------------------------------------------------------
++      parameter (pcmax=100,player=25)
++      real*4 x(player,pcmax),z(player,pcmax),xv1(player,pcmax),
++     &     xv2(player,pcmax),v1(player,pcmax),
++     &     v2(player,pcmax)
++      integer numz(pcmax),numv1(pcmax),numv2(pcmax),
++     &     nz(player),nv1(player),nv2(player),
++     &     invz(player,pcmax),invv1(player,pcmax),invv2(player,pcmax)
++      character*80 string
++      character*130 ifile,ofile
++c-----------------------------------------------------------------------
++      write(*,*) 'Enter input file name [<return> for "c.in"]'
++      read(*,1030) ifile
++ 1030 format(a130)
++      if(ifile.eq.'') ifile='c.in'
++      write(*,*) 'Enter output file name [<return> for "v.in"]'
++      read(*,1030) ofile
++      if(ofile.eq.'') ofile='v.in'
++      open(7,file=ifile,status='old')
++      open(8,file=ofile,status='unknown')
++c-----------------------------------------------------------------------
++      read(7,80) string
++ 80   format(a80)
++      if(string(1:1).ne.'b'.and.string(1:1).ne.'B') then
++         write(*,*) '* Error in file: c.in'
++         write(*,*) '  First character of first line must be "B"'
++         stop
++      end if
++      layer=1
++      nz(layer)=1
++ 10   continue
++      read(7,80,end=998) string
++      if(string(1:1).eq.'b'.or.string(1:1).eq.'B') then
++         nz(layer)=nz(layer)-1
++         layer=layer+1
++         nz(layer)=1
++         goto 10
++      elseif(string(1:1).eq.'v'.or.string(1:1).eq.'V') then
++         goto 1000
++      end if
++      read(string,*) x(layer,nz(layer)),z(layer,nz(layer)),
++     &     invz(layer,nz(layer))
++      nz(layer)=nz(layer)+1
++      goto 10
++      
++ 1000 continue
++      nz(layer)=nz(layer)-1
++      xmax=-9e9
++      do k=1,nz(layer)
++         xmax=max(xmax,x(layer,k))
++      end do
++      write(*,*) 'xmax = ',xmax
++      layer=1
++      nv1(layer)=1
++      nv2(layer)=1
++ 11   continue
++      read(7,80,end=999) string
++      if(string(1:1).eq.'v'.or.string(1:1).eq.'V') then
++         nv1(layer)=nv1(layer)-1
++         nv2(layer)=nv2(layer)-1
++         layer=layer+1
++         nv1(layer)=1
++         nv2(layer)=1
++         goto 11
++      end if
++      read(string,*) xz,vt1,iv1,vt2,iv2
++      if(vt1.gt.0.) then
++         xv1(layer,nv1(layer))=xz
++         v1(layer,nv1(layer))=vt1
++         invv1(layer,nv1(layer))=iv1
++         nv1(layer)=nv1(layer)+1
++      end if
++      if(vt2.gt.0.) then
++         xv2(layer,nv2(layer))=xz
++         v2(layer,nv2(layer))=vt2
++         invv2(layer,nv2(layer))=iv2
++         nv2(layer)=nv2(layer)+1
++      end if
++      goto 11
++
++ 998  continue
++      write(*,*) '* Error in file: "c.in:'
++      write(*,*) '  Short file'
++
++ 999  continue
++      nv1(layer)=nv1(layer)-1
++      nv2(layer)=nv2(layer)-1
++
++      write(*,*) 'Number of layers = ',layer
++
++c Write out rayinvr v.in-formatted file
++
++      do i=1,layer
++         mz=nz(i)/10
++         mv1=nv1(i)/10
++         mv2=nv2(i)/10
++         nremz=mod(nz(i),10)
++         nremv1=mod(nv1(i),10)
++         nremv2=mod(nv2(i),10)
++c-----------------------------------------------------------------------   
++c write out Z values
++c
++         if(mz.ge.1) then
++            do ii=1,mz
++               numz(ii)=10
++            end do
++         end if
++         if(nremz.gt.0) then
++            mz=mz+1
++            numz(mz)=nremz
++         end if
++         n1=1
++         n2=numz(1)
++         do j=1,mz
++            icont=1
++            write(8,100) i,(x(i,nn),nn=n1,n2)
++            if(j.eq.mz) icont=0
++            write(8,100) icont,(z(i,nn),nn=n1,n2)
++            write(8,101) (invz(i,nn),nn=n1,n2)
++            if(j.lt.mz) then
++               n1=n2+1
++               n2=n2+numz(j+1)
++            end if
++         end do
++c         
++c write out v1 values
++c
++         if(mv1.ge.1) then
++            do ii=1,mv1
++               numv1(ii)=10
++            end do
++         end if
++         if(nremv1.gt.0) then
++            mv1=mv1+1
++            numv1(mv1)=nremv1
++         end if
++         n1=1
++         n2=numv1(1)
++         do j=1,mv1
++            icont=1
++            if(j.eq.mv1) icont=0
++            write(8,100) i,(xv1(i,nn),nn=n1,n2)
++            write(8,100) icont,(v1(i,nn),nn=n1,n2)
++            write(8,101) (invv1(i,nn),nn=n1,n2)
++            if(j.lt.mv1) then
++               n1=n2+1
++               n2=n2+numv1(j+1)
++            end if
++         end do
++         if(mv1.eq.0) then
++            write(8,100) i,xmax
++            write(8,100) 0,0.
++            write(8,101) 0
++         end if
++c         
++c write out v2 values
++c
++         if(mv2.ge.1) then
++            do ii=1,mv2
++               numv2(ii)=10
++            end do
++         end if
++         if(nremv2.gt.0) then
++            mv2=mv2+1
++            numv2(mv2)=nremv2
++         end if
++         n1=1
++         n2=numv2(1)
++         do j=1,mv2
++            icont=1
++            if(j.eq.mv2) icont=0
++            write(8,100) i,(xv2(i,nn),nn=n1,n2)
++            write(8,100) icont,(v2(i,nn),nn=n1,n2)
++            write(8,101) (invv2(i,nn),nn=n1,n2)
++            if(j.lt.mv2) then
++               n1=n2+1
++               n2=n2+numv2(j+1)
++            end if
++         end do
++         if(mv2.eq.0) then
++            write(8,100) i,xmax
++            write(8,100) 0,0.
++            write(8,101) 0
++         end if
++
++      end do
++c-----------------------------------------------------------------------
++      mz=nz(i)/10
++      nremz=mod(nz(i),10)
++      if(mz.ge.1) then
++         do ii=1,mz
++            numz(ii)=10
++         end do
++      end if
++      if(nremz.gt.0) then
++         mz=mz+1
++         numz(mz)=nremz
++      end if
++      n1=1
++      n2=numz(1)
++      do j=1,mz
++         icont=1
++         write(8,100) i,(x(i,nn),nn=n1,n2)
++         if(j.eq.mz) icont=0
++         write(8,100) icont,(z(i,nn),nn=n1,n2)
++         if(j.lt.mz) then
++            n1=n2+1
++            n2=n2+numz(j+1)
++         end if
++      end do
++c-----------------------------------------------------------------------
++ 100  format(I2, 1X, 10F8.3)
++ 101  format(3X, 10I8)
++
++      stop
++      end
+Index: misc/README
+===================================================================
+--- misc/README	(revision 0)
++++ misc/README	(revision 1072)
+@@ -0,0 +1,7 @@
++The files v2c.com and v2c.par are "include files" for v2c.f.
++
++v2c can be compiled using something like:
++	f77 v2c.f -o v2c
++Similarly, c2v can be compiled using something like:
++	f77 c2v.f -o c2v
++
+Index: misc/dmplstsqr.f
+===================================================================
+--- misc/dmplstsqr.f	(revision 1071)
++++ misc/dmplstsqr.f	(revision 1072)
+@@ -200,8 +200,9 @@
+          read(13,55,end=999) ilyr,(xm(icont,j),j=j1,j2)
+          read(13,55,end=999) icnt,(zm(icont,j),j=j1,j2)
+          read(13,65,end=99) (ivarz(icont,j),j=j1,j2)
+-55       format(i2,1x,10f7.2)
+-65       format(3x,10i7)
++55       format(i2,1x,10f8.3)
++c65       format(3x,10i8)
++65       format(3x,10(6x,i2))
+          nrz=nrz+1
+          if(icnt.ne.1) go to 211
+          j1=j1+10
+Index: examples/setup9
+===================================================================
+--- examples/setup9	(revision 0)
++++ examples/setup9	(revision 1072)
+@@ -0,0 +1,6 @@
++cp r9.in r.in
++cp tx9.in tx.in
++cp d9.in d.in
++cp v9.in v.in
++cp vm9.in vm.in
++cp c9.in c.in
+Index: examples/d9.in
+===================================================================
+--- examples/d9.in	(revision 0)
++++ examples/d9.in	(revision 1072)
+@@ -0,0 +1,5 @@
++  &dmppar  xmax=10., 
++           dmpfct=1.0,
++           velunc=0.010,
++           bndunc=0.010,
++  &end   
+Index: examples/tx9.in
+===================================================================
+--- examples/tx9.in	(revision 0)
++++ examples/tx9.in	(revision 1072)
+@@ -0,0 +1,905 @@
++     0.464    -1.000     0.000         0
++    -1.888     2.082     0.010         1
++    -1.878     2.079     0.010         1
++    -1.851     2.064     0.010         1
++    -1.841     2.058     0.010         1
++    -1.792     2.032     0.010         1
++    -1.786     2.030     0.010         1
++    -1.724     1.999     0.010         1
++    -1.651     1.964     0.010         1
++    -1.572     1.924     0.010         1
++    -1.493     1.887     0.010         1
++    -1.414     1.849     0.010         1
++    -1.335     1.814     0.010         1
++    -1.254     1.777     0.010         1
++    -1.177     1.742     0.010         1
++    -1.098     1.710     0.010         1
++    -1.016     1.677     0.010         1
++    -0.935     1.644     0.010         1
++    -0.856     1.614     0.010         1
++    -0.779     1.587     0.010         1
++    -0.700     1.559     0.010         1
++    -0.621     1.533     0.010         1
++    -0.544     1.508     0.010         1
++    -0.465     1.484     0.010         1
++    -0.386     1.462     0.010         1
++    -0.307     1.442     0.010         1
++    -0.230     1.424     0.010         1
++    -0.150     1.408     0.010         1
++    -0.069     1.394     0.010         1
++    -1.897     2.152     0.010         2
++    -1.888     2.145     0.010         2
++    -1.878     2.142     0.010         2
++    -1.851     2.128     0.010         2
++    -1.841     2.122     0.010         2
++    -1.786     2.095     0.010         2
++    -1.724     2.065     0.010         2
++    -1.572     1.992     0.010         2
++    -1.493     1.956     0.010         2
++    -1.414     1.920     0.010         2
++    -1.335     1.886     0.010         2
++    -1.254     1.851     0.010         2
++    -1.177     1.817     0.010         2
++    -1.098     1.786     0.010         2
++    -1.016     1.755     0.010         2
++    -0.935     1.723     0.010         2
++    -0.856     1.695     0.010         2
++    -0.779     1.669     0.010         2
++    -0.700     1.643     0.010         2
++    -0.621     1.617     0.010         2
++    -0.465     1.572     0.010         2
++    -0.386     1.551     0.010         2
++    -0.307     1.533     0.010         2
++    -0.230     1.516     0.010         2
++    -0.150     1.502     0.010         2
++    -0.069     1.488     0.010         2
++    -1.897     2.175     0.010         3
++    -1.878     2.164     0.010         3
++    -1.841     2.145     0.010         3
++    -1.786     2.118     0.010         3
++    -1.724     2.088     0.010         3
++    -1.651     2.055     0.010         3
++    -1.572     2.018     0.010         3
++    -1.493     1.982     0.010         3
++    -1.414     1.947     0.010         3
++    -1.335     1.914     0.010         3
++    -1.254     1.879     0.010         3
++    -1.177     1.846     0.010         3
++    -1.098     1.816     0.010         3
++    -1.016     1.785     0.010         3
++    -0.935     1.754     0.010         3
++    -0.856     1.727     0.010         3
++    -0.779     1.701     0.010         3
++    -0.700     1.676     0.010         3
++    -0.621     1.652     0.010         3
++    -0.544     1.628     0.010         3
++    -0.465     1.607     0.010         3
++    -0.386     1.586     0.010         3
++    -0.307     1.568     0.010         3
++    -0.230     1.551     0.010         3
++    -0.150     1.537     0.010         3
++    -0.069     1.523     0.010         3
++    -1.897     2.192     0.010         4
++    -1.888     2.188     0.010         4
++    -1.878     2.183     0.010         4
++    -1.851     2.170     0.010         4
++    -1.841     2.165     0.010         4
++    -1.792     2.141     0.010         4
++    -1.786     2.138     0.010         4
++    -1.724     2.109     0.010         4
++    -1.651     2.075     0.010         4
++    -1.572     2.038     0.010         4
++    -1.493     2.003     0.010         4
++    -1.414     1.968     0.010         4
++    -1.335     1.936     0.010         4
++    -1.254     1.902     0.010         4
++    -1.177     1.870     0.010         4
++    -1.098     1.840     0.010         4
++    -1.016     1.810     0.010         4
++    -0.935     1.780     0.010         4
++    -0.856     1.753     0.010         4
++    -0.779     1.727     0.010         4
++    -0.700     1.702     0.010         4
++    -0.621     1.679     0.010         4
++    -0.544     1.656     0.010         4
++    -0.465     1.634     0.010         4
++    -0.386     1.615     0.010         4
++    -0.307     1.597     0.010         4
++    -0.230     1.582     0.010         4
++    -0.150     1.566     0.010         4
++    -0.069     1.552     0.010         4
++    -1.888     2.233     0.010         5
++    -1.878     2.229     0.010         5
++    -1.841     2.210     0.010         5
++    -1.786     2.184     0.010         5
++    -1.724     2.156     0.010         5
++    -1.572     2.088     0.010         5
++    -1.493     2.054     0.010         5
++    -1.414     2.021     0.010         5
++    -1.335     1.990     0.010         5
++    -1.254     1.958     0.010         5
++    -1.016     1.868     0.010         5
++    -0.935     1.838     0.010         5
++    -0.856     1.813     0.010         5
++    -0.779     1.789     0.010         5
++    -0.621     1.742     0.010         5
++    -0.544     1.720     0.010         5
++    -0.465     1.699     0.010         5
++    -0.386     1.680     0.010         5
++    -0.307     1.663     0.010         5
++    -0.230     1.648     0.010         5
++    -0.150     1.634     0.010         5
++    -0.069     1.621     0.010         5
++    -1.897     2.277     0.010         6
++    -1.888     2.271     0.010         6
++    -1.851     2.256     0.010         6
++    -1.841     2.249     0.010         6
++    -1.572     2.132     0.010         6
++    -1.493     2.099     0.010         6
++    -1.414     2.066     0.010         6
++    -1.335     2.036     0.010         6
++    -1.254     2.005     0.010         6
++    -1.177     1.975     0.010         6
++    -1.098     1.948     0.010         6
++    -0.935     1.891     0.010         6
++    -0.856     1.866     0.010         6
++    -0.779     1.843     0.010         6
++    -0.700     1.819     0.010         6
++    -0.621     1.798     0.010         6
++    -0.544     1.777     0.010         6
++    -0.465     1.758     0.010         6
++    -0.386     1.739     0.010         6
++    -0.307     1.722     0.010         6
++    -0.230     1.708     0.010         6
++    -0.150     1.695     0.010         6
++    -0.069     1.684     0.010         6
++    -1.878     2.293     0.010         7
++    -1.841     2.275     0.010         7
++    -1.786     2.251     0.010         7
++    -1.724     2.224     0.010         7
++    -1.651     2.194     0.010         7
++    -1.572     2.160     0.010         7
++    -1.493     2.129     0.010         7
++    -1.414     2.097     0.010         7
++    -1.335     2.068     0.010         7
++    -1.254     2.038     0.010         7
++    -1.177     2.008     0.010         7
++    -1.098     1.981     0.010         7
++    -1.016     1.955     0.010         7
++    -0.935     1.927     0.010         7
++    -0.856     1.902     0.010         7
++    -0.779     1.880     0.010         7
++    -0.700     1.859     0.010         7
++    -0.621     1.838     0.010         7
++    -0.544     1.818     0.010         7
++    -0.465     1.799     0.010         7
++    -0.386     1.781     0.010         7
++    -0.307     1.766     0.010         7
++    -0.230     1.752     0.010         7
++    -0.150     1.739     0.010         7
++    -0.069     1.727     0.010         7
++    -1.888     2.338     0.010         8
++    -1.878     2.332     0.010         8
++    -1.851     2.321     0.010         8
++    -1.841     2.317     0.010         8
++    -1.786     2.294     0.010         8
++    -1.724     2.268     0.010         8
++    -1.651     2.239     0.010         8
++    -1.572     2.207     0.010         8
++    -1.493     2.177     0.010         8
++    -1.335     2.118     0.010         8
++    -1.254     2.090     0.010         8
++    -1.177     2.061     0.010         8
++    -1.098     2.036     0.010         8
++    -1.016     2.012     0.010         8
++    -0.935     1.985     0.010         8
++    -0.856     1.961     0.010         8
++    -0.779     1.940     0.010         8
++    -0.700     1.918     0.010         8
++    -0.621     1.897     0.010         8
++    -0.544     1.878     0.010         8
++    -0.465     1.860     0.010         8
++    -0.307     1.828     0.010         8
++    -0.230     1.815     0.010         8
++    -0.150     1.803     0.010         8
++    -0.069     1.790     0.010         8
++    -1.897     2.409     0.010        10
++    -1.888     2.404     0.010        10
++    -1.878     2.401     0.010        10
++    -1.851     2.388     0.010        10
++    -1.841     2.384     0.010        10
++    -1.792     2.366     0.010        10
++    -1.786     2.362     0.010        10
++    -1.724     2.338     0.010        10
++    -1.651     2.310     0.010        10
++    -1.572     2.281     0.010        10
++    -1.493     2.251     0.010        10
++    -1.414     2.222     0.010        10
++    -1.335     2.195     0.010        10
++    -1.254     2.167     0.010        10
++    -1.177     2.141     0.010        10
++    -1.098     2.116     0.010        10
++    -1.016     2.092     0.010        10
++    -0.935     2.067     0.010        10
++    -0.856     2.045     0.010        10
++    -0.779     2.025     0.010        10
++    -0.700     2.005     0.010        10
++    -0.621     1.986     0.010        10
++    -0.544     1.967     0.010        10
++    -0.465     1.949     0.010        10
++    -0.386     1.931     0.010        10
++    -0.307     1.916     0.010        10
++    -0.230     1.903     0.010        10
++    -0.150     1.893     0.010        10
++    -0.069     1.882     0.010        10
++    -1.897     2.570     0.010        12
++    -1.888     2.567     0.010        12
++    -1.878     2.563     0.010        12
++    -1.851     2.556     0.010        12
++    -1.841     2.551     0.010        12
++    -1.786     2.532     0.010        12
++    -1.724     2.509     0.010        12
++    -1.651     2.484     0.010        12
++    -1.572     2.456     0.010        12
++    -1.493     2.430     0.010        12
++    -1.414     2.406     0.010        12
++    -1.335     2.382     0.010        12
++    -1.254     2.358     0.010        12
++    -1.177     2.337     0.010        12
++    -1.098     2.316     0.010        12
++    -1.016     2.295     0.010        12
++    -0.935     2.275     0.010        12
++    -0.856     2.255     0.010        12
++    -0.779     2.236     0.010        12
++    -0.700     2.219     0.010        12
++    -0.621     2.202     0.010        12
++    -0.544     2.187     0.010        12
++    -0.465     2.172     0.010        12
++    -0.386     2.158     0.010        12
++    -0.307     2.146     0.010        12
++    -0.230     2.135     0.010        12
++    -0.150     2.125     0.010        12
++    -0.069     2.116     0.010        12
++     0.464     1.000     0.000         0
++     0.009     1.380     0.010         1
++     0.087     1.368     0.010         1
++     0.168     1.360     0.010         1
++     0.247     1.353     0.010         1
++     0.316     1.348     0.010         1
++     0.562     1.346     0.010         1
++     0.564     1.346     0.010         1
++     0.614     1.348     0.010         1
++     0.682     1.352     0.010         1
++     0.757     1.358     0.010         1
++     0.836     1.367     0.010         1
++     0.912     1.377     0.010         1
++     0.987     1.390     0.010         1
++     1.064     1.403     0.010         1
++     1.141     1.417     0.010         1
++     1.221     1.435     0.010         1
++     1.300     1.455     0.010         1
++     1.380     1.478     0.010         1
++     1.463     1.501     0.010         1
++     1.542     1.527     0.010         1
++     1.623     1.552     0.010         1
++     1.702     1.579     0.010         1
++     1.781     1.609     0.010         1
++     1.863     1.639     0.010         1
++     1.940     1.670     0.010         1
++     2.021     1.702     0.010         1
++     2.098     1.734     0.010         1
++     2.179     1.768     0.010         1
++     2.258     1.804     0.010         1
++     2.339     1.840     0.010         1
++     2.417     1.876     0.010         1
++     2.494     1.914     0.010         1
++     2.575     1.951     0.010         1
++     2.654     1.991     0.010         1
++     2.731     2.030     0.010         1
++     2.892     2.111     0.010         1
++     2.971     2.153     0.010         1
++     3.052     2.196     0.010         1
++     3.131     2.238     0.010         1
++     3.210     2.281     0.010         1
++     3.289     2.326     0.010         1
++     3.371     2.369     0.010         1
++     3.450     2.414     0.010         1
++     3.532     2.460     0.010         1
++     3.611     2.505     0.010         1
++     3.688     2.549     0.010         1
++     3.766     2.593     0.010         1
++     3.848     2.640     0.010         1
++     3.927     2.688     0.010         1
++     4.010     2.735     0.010         1
++     4.092     2.782     0.010         1
++     4.168     2.829     0.010         1
++     4.246     2.874     0.010         1
++     4.322     2.919     0.010         1
++     4.402     2.966     0.010         1
++     4.481     3.014     0.010         1
++     4.562     3.062     0.010         1
++     4.642     3.113     0.010         1
++     4.726     3.162     0.010         1
++     4.805     3.213     0.010         1
++     4.885     3.260     0.010         1
++     5.042     3.356     0.010         1
++     5.121     3.405     0.010         1
++     5.200     3.455     0.010         1
++     5.280     3.503     0.010         1
++     5.359     3.555     0.010         1
++     5.438     3.603     0.010         1
++     5.518     3.653     0.010         1
++     5.595     3.702     0.010         1
++     5.674     3.751     0.010         1
++     5.753     3.801     0.010         1
++     5.836     3.853     0.010         1
++     5.915     3.902     0.010         1
++     5.995     3.953     0.010         1
++     6.074     4.003     0.010         1
++     6.154     4.053     0.010         1
++     6.235     4.106     0.010         1
++     6.318     4.157     0.010         1
++     6.398     4.210     0.010         1
++     6.479     4.260     0.010         1
++     6.558     4.310     0.010         1
++     6.636     4.360     0.010         1
++     6.716     4.412     0.010         1
++     6.795     4.464     0.010         1
++     6.874     4.514     0.010         1
++     6.951     4.564     0.010         1
++     7.032     4.615     0.010         1
++     7.113     4.668     0.010         1
++     7.192     4.719     0.010         1
++     7.270     4.770     0.010         1
++     7.351     4.821     0.010         1
++     7.429     4.870     0.010         1
++     7.510     4.923     0.010         1
++     7.591     4.976     0.010         1
++     7.672     5.028     0.010         1
++     7.752     5.080     0.010         1
++     7.832     5.131     0.010         1
++     7.911     5.183     0.010         1
++     7.990     5.236     0.010         1
++     8.068     5.285     0.010         1
++     8.145     5.335     0.010         1
++     8.301     5.437     0.010         1
++     8.384     5.489     0.010         1
++     8.543     5.596     0.010         1
++     8.625     5.648     0.010         1
++     8.705     5.700     0.010         1
++     8.781     5.750     0.010         1
++     8.861     5.802     0.010         1
++     8.937     5.854     0.010         1
++     9.095     5.956     0.010         1
++     9.175     6.008     0.010         1
++     9.255     6.060     0.010         1
++     9.333     6.114     0.010         1
++     9.413     6.166     0.010         1
++     9.495     6.218     0.010         1
++     9.575     6.272     0.010         1
++     9.656     6.323     0.010         1
++     9.731     6.374     0.010         1
++     9.811     6.427     0.010         1
++     9.889     6.480     0.010         1
++     9.969     6.531     0.010         1
++    10.050     6.584     0.010         1
++    10.128     6.636     0.010         1
++    10.207     6.687     0.010         1
++    10.285     6.739     0.010         1
++    10.361     6.791     0.010         1
++    10.436     6.841     0.010         1
++    10.514     6.891     0.010         1
++    10.589     6.940     0.010         1
++    10.668     6.991     0.010         1
++    10.746     7.044     0.010         1
++    10.823     7.095     0.010         1
++    10.903     7.147     0.010         1
++    10.983     7.199     0.010         1
++    11.061     7.252     0.010         1
++    11.139     7.304     0.010         1
++    11.219     7.356     0.010         1
++    11.299     7.409     0.010         1
++    11.377     7.460     0.010         1
++    11.457     7.514     0.010         1
++    11.536     7.566     0.010         1
++    11.620     7.619     0.010         1
++    11.698     7.674     0.010         1
++    11.779     7.727     0.010         1
++    11.859     7.780     0.010         1
++    11.939     7.833     0.010         1
++    12.021     7.886     0.010         1
++     0.009     1.475     0.010         2
++     0.087     1.464     0.010         2
++     0.168     1.456     0.010         2
++     0.247     1.449     0.010         2
++     0.316     1.445     0.010         2
++     0.562     1.442     0.010         2
++     0.564     1.442     0.010         2
++     0.614     1.444     0.010         2
++     0.682     1.448     0.010         2
++     0.757     1.453     0.010         2
++     0.836     1.462     0.010         2
++     0.912     1.471     0.010         2
++     0.987     1.482     0.010         2
++     1.064     1.494     0.010         2
++     1.141     1.508     0.010         2
++     1.221     1.525     0.010         2
++     1.300     1.542     0.010         2
++     1.380     1.563     0.010         2
++     1.463     1.585     0.010         2
++     1.542     1.609     0.010         2
++     1.623     1.633     0.010         2
++     1.702     1.658     0.010         2
++     1.781     1.685     0.010         2
++     1.863     1.714     0.010         2
++     1.940     1.743     0.010         2
++     2.021     1.773     0.010         2
++     2.098     1.804     0.010         2
++     2.179     1.837     0.010         2
++     2.258     1.870     0.010         2
++     2.339     1.906     0.010         2
++     2.417     1.939     0.010         2
++     2.494     1.976     0.010         2
++     2.575     2.012     0.010         2
++     2.654     2.050     0.010         2
++     2.731     2.088     0.010         2
++     2.812     2.127     0.010         2
++     0.009     1.510     0.010         3
++     0.087     1.500     0.010         3
++     0.168     1.492     0.010         3
++     0.247     1.486     0.010         3
++     0.316     1.482     0.010         3
++     0.562     1.479     0.010         3
++     0.564     1.478     0.010         3
++     0.614     1.480     0.010         3
++     0.682     1.483     0.010         3
++     0.757     1.489     0.010         3
++     0.836     1.497     0.010         3
++     0.912     1.506     0.010         3
++     0.987     1.516     0.010         3
++     1.064     1.529     0.010         3
++     1.141     1.542     0.010         3
++     1.221     1.559     0.010         3
++     1.300     1.577     0.010         3
++     1.380     1.596     0.010         3
++     1.463     1.617     0.010         3
++     1.542     1.640     0.010         3
++     1.623     1.663     0.010         3
++     1.702     1.687     0.010         3
++     1.781     1.714     0.010         3
++     1.863     1.743     0.010         3
++     1.940     1.772     0.010         3
++     2.021     1.801     0.010         3
++     2.098     1.831     0.010         3
++     2.179     1.862     0.010         3
++     2.258     1.895     0.010         3
++     2.339     1.930     0.010         3
++     2.417     1.963     0.010         3
++     2.494     1.998     0.010         3
++     2.575     2.034     0.010         3
++     2.654     2.071     0.010         3
++     2.731     2.107     0.010         3
++     2.812     2.147     0.010         3
++     2.892     2.184     0.010         3
++     2.971     2.223     0.010         3
++     3.052     2.264     0.010         3
++     3.131     2.304     0.010         3
++     3.210     2.345     0.010         3
++     3.289     2.388     0.010         3
++     3.371     2.430     0.010         3
++     3.450     2.472     0.010         3
++     3.532     2.516     0.010         3
++     3.611     2.558     0.010         3
++     3.766     2.643     0.010         3
++     3.848     2.689     0.010         3
++     3.927     2.734     0.010         3
++     4.010     2.779     0.010         3
++     4.092     2.824     0.010         3
++     4.168     2.869     0.010         3
++     4.246     2.912     0.010         3
++     0.009     1.540     0.010         4
++     0.087     1.530     0.010         4
++     0.168     1.523     0.010         4
++     0.247     1.514     0.010         4
++     0.316     1.511     0.010         4
++     0.562     1.509     0.010         4
++     0.564     1.509     0.010         4
++     0.614     1.510     0.010         4
++     0.682     1.514     0.010         4
++     0.757     1.519     0.010         4
++     0.836     1.526     0.010         4
++     0.912     1.534     0.010         4
++     0.987     1.545     0.010         4
++     1.064     1.557     0.010         4
++     1.141     1.570     0.010         4
++     1.221     1.586     0.010         4
++     1.300     1.603     0.010         4
++     1.702     1.715     0.010         4
++     1.781     1.742     0.010         4
++     1.863     1.769     0.010         4
++     1.940     1.798     0.010         4
++     2.021     1.827     0.010         4
++     2.098     1.856     0.010         4
++     2.258     1.918     0.010         4
++     2.339     1.952     0.010         4
++     2.417     1.984     0.010         4
++     2.494     2.019     0.010         4
++     2.575     2.053     0.010         4
++     2.654     2.091     0.010         4
++     2.731     2.126     0.010         4
++     2.812     2.165     0.010         4
++     2.892     2.202     0.010         4
++     2.971     2.242     0.010         4
++     3.052     2.282     0.010         4
++     3.131     2.321     0.010         4
++     3.210     2.361     0.010         4
++     3.371     2.444     0.010         4
++     3.450     2.486     0.010         4
++     3.532     2.529     0.010         4
++     3.611     2.571     0.010         4
++     3.688     2.613     0.010         4
++     3.766     2.654     0.010         4
++     3.848     2.699     0.010         4
++     3.927     2.744     0.010         4
++     4.010     2.788     0.010         4
++     4.092     2.834     0.010         4
++     4.168     2.877     0.010         4
++     4.246     2.921     0.010         4
++     4.322     2.963     0.010         4
++     4.402     3.008     0.010         4
++     4.481     3.054     0.010         4
++     0.009     1.609     0.010         5
++     0.087     1.599     0.010         5
++     0.168     1.593     0.010         5
++     0.247     1.585     0.010         5
++     0.316     1.581     0.010         5
++     0.562     1.579     0.010         5
++     0.564     1.579     0.010         5
++     0.614     1.579     0.010         5
++     0.682     1.582     0.010         5
++     0.757     1.586     0.010         5
++     0.836     1.593     0.010         5
++     0.912     1.602     0.010         5
++     0.987     1.612     0.010         5
++     1.064     1.623     0.010         5
++     1.141     1.636     0.010         5
++     1.221     1.650     0.010         5
++     1.300     1.667     0.010         5
++     1.380     1.685     0.010         5
++     1.463     1.706     0.010         5
++     1.542     1.728     0.010         5
++     1.623     1.749     0.010         5
++     1.863     1.825     0.010         5
++     1.940     1.851     0.010         5
++     2.021     1.878     0.010         5
++     2.098     1.906     0.010         5
++     2.179     1.935     0.010         5
++     2.258     1.966     0.010         5
++     2.339     1.999     0.010         5
++     2.417     2.031     0.010         5
++     2.494     2.065     0.010         5
++     2.575     2.097     0.010         5
++     2.654     2.133     0.010         5
++     2.731     2.168     0.010         5
++     2.812     2.205     0.010         5
++     2.892     2.240     0.010         5
++     2.971     2.278     0.010         5
++     3.052     2.318     0.010         5
++     3.131     2.356     0.010         5
++     3.210     2.394     0.010         5
++     3.289     2.435     0.010         5
++     3.371     2.475     0.010         5
++     3.450     2.516     0.010         5
++     3.532     2.558     0.010         5
++     3.611     2.598     0.010         5
++     3.688     2.639     0.010         5
++     3.766     2.679     0.010         5
++     3.848     2.723     0.010         5
++     4.010     2.809     0.010         5
++     4.092     2.852     0.010         5
++     4.168     2.895     0.010         5
++     4.246     2.937     0.010         5
++     4.322     2.978     0.010         5
++     4.402     3.021     0.010         5
++     4.481     3.065     0.010         5
++     0.009     1.672     0.010         6
++     0.087     1.662     0.010         6
++     0.168     1.655     0.010         6
++     0.247     1.649     0.010         6
++     0.316     1.644     0.010         6
++     0.562     1.642     0.010         6
++     0.564     1.642     0.010         6
++     0.614     1.644     0.010         6
++     0.836     1.657     0.010         6
++     0.987     1.674     0.010         6
++     1.064     1.684     0.010         6
++     1.141     1.694     0.010         6
++     1.221     1.709     0.010         6
++     1.300     1.725     0.010         6
++     1.380     1.742     0.010         6
++     1.463     1.761     0.010         6
++     1.542     1.782     0.010         6
++     1.623     1.802     0.010         6
++     1.702     1.823     0.010         6
++     1.781     1.847     0.010         6
++     1.940     1.899     0.010         6
++     2.021     1.925     0.010         6
++     2.098     1.952     0.010         6
++     2.179     1.979     0.010         6
++     2.258     2.010     0.010         6
++     2.339     2.042     0.010         6
++     2.417     2.073     0.010         6
++     2.494     2.105     0.010         6
++     2.575     2.138     0.010         6
++     2.654     2.170     0.010         6
++     2.731     2.204     0.010         6
++     2.812     2.240     0.010         6
++     2.892     2.274     0.010         6
++     2.971     2.310     0.010         6
++     3.052     2.348     0.010         6
++     3.131     2.385     0.010         6
++     3.210     2.422     0.010         6
++     3.289     2.460     0.010         6
++     3.450     2.534     0.010         6
++     3.532     2.577     0.010         6
++     3.611     2.617     0.010         6
++     3.688     2.657     0.010         6
++     3.766     2.695     0.010         6
++     3.848     2.738     0.010         6
++     3.927     2.781     0.010         6
++     0.009     1.716     0.010         7
++     0.087     1.707     0.010         7
++     0.168     1.699     0.010         7
++     0.247     1.693     0.010         7
++     0.316     1.689     0.010         7
++     0.562     1.687     0.010         7
++     0.564     1.687     0.010         7
++     0.614     1.687     0.010         7
++     0.682     1.690     0.010         7
++     0.757     1.694     0.010         7
++     0.836     1.699     0.010         7
++     0.912     1.706     0.010         7
++     0.987     1.715     0.010         7
++     1.064     1.725     0.010         7
++     1.141     1.735     0.010         7
++     1.221     1.749     0.010         7
++     1.300     1.764     0.010         7
++     1.380     1.781     0.010         7
++     1.463     1.800     0.010         7
++     1.542     1.819     0.010         7
++     1.623     1.838     0.010         7
++     1.702     1.859     0.010         7
++     1.781     1.883     0.010         7
++     1.863     1.907     0.010         7
++     1.940     1.932     0.010         7
++     2.021     1.957     0.010         7
++     2.098     1.983     0.010         7
++     2.179     2.010     0.010         7
++     2.258     2.038     0.010         7
++     2.339     2.068     0.010         7
++     2.417     2.099     0.010         7
++     2.494     2.131     0.010         7
++     2.575     2.160     0.010         7
++     2.654     2.194     0.010         7
++     2.731     2.226     0.010         7
++     2.812     2.260     0.010         7
++     2.892     2.295     0.010         7
++     2.971     2.329     0.010         7
++     3.052     2.366     0.010         7
++     3.131     2.401     0.010         7
++     0.009     1.779     0.010         8
++     0.087     1.769     0.010         8
++     0.168     1.762     0.010         8
++     0.247     1.756     0.010         8
++     0.316     1.750     0.010         8
++     0.562     1.750     0.010         8
++     0.564     1.748     0.010         8
++     0.614     1.750     0.010         8
++     0.682     1.752     0.010         8
++     0.757     1.755     0.010         8
++     0.836     1.760     0.010         8
++     0.912     1.767     0.010         8
++     0.987     1.775     0.010         8
++     1.064     1.784     0.010         8
++     1.141     1.795     0.010         8
++     1.221     1.807     0.010         8
++     1.300     1.821     0.010         8
++     1.380     1.837     0.010         8
++     1.463     1.854     0.010         8
++     1.542     1.872     0.010         8
++     1.623     1.891     0.010         8
++     1.702     1.911     0.010         8
++     1.781     1.932     0.010         8
++     1.863     1.955     0.010         8
++     1.940     1.978     0.010         8
++     2.021     2.003     0.010         8
++     2.098     2.027     0.010         8
++     2.258     2.081     0.010         8
++     2.339     2.110     0.010         8
++     2.417     2.138     0.010         8
++     2.494     2.167     0.010         8
++     2.575     2.197     0.010         8
++     2.654     2.229     0.010         8
++     2.731     2.261     0.010         8
++     2.812     2.295     0.010         8
++     2.892     2.326     0.010         8
++     2.971     2.359     0.010         8
++     3.052     2.395     0.010         8
++     3.131     2.429     0.010         8
++     3.289     2.500     0.010         8
++     0.682     1.810     0.010         9
++     0.912     1.825     0.010         9
++     0.987     1.833     0.010         9
++     1.064     1.842     0.010         9
++     1.221     1.863     0.010         9
++     1.300     1.877     0.010         9
++     1.380     1.892     0.010         9
++     1.463     1.906     0.010         9
++     1.542     1.924     0.010         9
++     1.702     1.959     0.010         9
++     1.781     1.977     0.010         9
++     1.863     2.002     0.010         9
++     1.940     2.023     0.010         9
++     2.021     2.048     0.010         9
++     2.098     2.071     0.010         9
++     2.179     2.093     0.010         9
++     2.258     2.122     0.010         9
++     2.417     2.176     0.010         9
++     2.494     2.204     0.010         9
++     2.575     2.233     0.010         9
++     2.654     2.265     0.010         9
++     2.731     2.294     0.010         9
++     2.812     2.327     0.010         9
++     2.892     2.358     0.010         9
++     2.971     2.390     0.010         9
++     3.052     2.425     0.010         9
++     3.131     2.457     0.010         9
++     0.009     1.871     0.010        10
++     0.087     1.863     0.010        10
++     0.168     1.858     0.010        10
++     0.247     1.852     0.010        10
++     0.316     1.849     0.010        10
++     0.562     1.846     0.010        10
++     0.564     1.846     0.010        10
++     0.614     1.847     0.010        10
++     0.682     1.848     0.010        10
++     0.912     1.863     0.010        10
++     0.987     1.871     0.010        10
++     1.064     1.879     0.010        10
++     1.141     1.888     0.010        10
++     1.221     1.900     0.010        10
++     1.300     1.912     0.010        10
++     1.380     1.927     0.010        10
++     1.463     1.944     0.010        10
++     1.542     1.961     0.010        10
++     1.623     1.978     0.010        10
++     1.702     2.000     0.010        10
++     1.781     2.019     0.010        10
++     1.863     2.036     0.010        10
++     1.940     2.058     0.010        10
++     2.021     2.080     0.010        10
++     2.098     2.103     0.010        10
++     2.179     2.127     0.010        10
++     2.258     2.153     0.010        10
++     2.339     2.180     0.010        10
++     2.417     2.205     0.010        10
++     2.494     2.233     0.010        10
++     2.575     2.259     0.010        10
++     2.654     2.289     0.010        10
++     2.731     2.317     0.010        10
++     2.812     2.350     0.010        10
++     2.892     2.379     0.010        10
++     2.971     2.410     0.010        10
++     3.052     2.443     0.010        10
++     3.131     2.475     0.010        10
++     3.210     2.508     0.010        10
++     3.289     2.539     0.010        10
++     3.371     2.579     0.010        10
++     3.450     2.615     0.010        10
++     3.532     2.652     0.010        10
++     3.611     2.687     0.010        10
++     3.688     2.723     0.010        10
++     3.766     2.758     0.010        10
++     3.848     2.796     0.010        10
++     3.927     2.833     0.010        10
++     4.010     2.871     0.010        10
++     4.092     2.908     0.010        10
++     4.168     2.945     0.010        10
++     0.564     1.945     0.010        11
++     0.614     1.946     0.010        11
++     0.682     1.948     0.010        11
++     0.757     1.952     0.010        11
++     0.836     1.957     0.010        11
++     0.912     1.963     0.010        11
++     0.987     1.972     0.010        11
++     1.064     1.981     0.010        11
++     1.141     1.989     0.010        11
++     1.221     2.002     0.010        11
++     1.300     2.014     0.010        11
++     1.380     2.029     0.010        11
++     1.463     2.043     0.010        11
++     1.542     2.060     0.010        11
++     1.623     2.074     0.010        11
++     1.702     2.090     0.010        11
++     1.781     2.108     0.010        11
++     1.863     2.127     0.010        11
++     1.940     2.147     0.010        11
++     2.021     2.168     0.010        11
++     2.179     2.212     0.010        11
++     2.258     2.236     0.010        11
++     2.339     2.263     0.010        11
++     2.417     2.288     0.010        11
++     2.654     2.369     0.010        11
++     2.812     2.426     0.010        11
++     3.131     2.547     0.010        11
++     3.210     2.578     0.010        11
++     3.289     2.616     0.010        11
++     3.371     2.647     0.010        11
++     3.450     2.681     0.010        11
++     3.532     2.716     0.010        11
++     3.611     2.749     0.010        11
++     3.688     2.783     0.010        11
++     3.766     2.816     0.010        11
++     3.848     2.850     0.010        11
++     3.927     2.887     0.010        11
++     0.009     2.109     0.010        12
++     0.087     2.103     0.010        12
++     0.168     2.098     0.010        12
++     0.247     2.093     0.010        12
++     0.316     2.090     0.010        12
++     0.562     2.089     0.010        12
++     0.564     2.087     0.010        12
++     0.614     2.087     0.010        12
++     0.682     2.088     0.010        12
++     0.757     2.090     0.010        12
++     0.836     2.093     0.010        12
++     0.912     2.098     0.010        12
++     0.987     2.103     0.010        12
++     1.064     2.110     0.010        12
++     1.141     2.117     0.010        12
++     1.221     2.126     0.010        12
++     1.300     2.136     0.010        12
++     1.380     2.147     0.010        12
++     1.463     2.160     0.010        12
++     1.542     2.174     0.010        12
++     1.623     2.188     0.010        12
++     1.702     2.204     0.010        12
++     1.781     2.220     0.010        12
++     1.863     2.239     0.010        12
++     1.940     2.256     0.010        12
++     2.021     2.276     0.010        12
++     2.098     2.295     0.010        12
++     2.179     2.316     0.010        12
++     2.258     2.338     0.010        12
++     2.339     2.361     0.010        12
++     2.417     2.384     0.010        12
++     2.494     2.407     0.010        12
++     2.575     2.433     0.010        12
++     2.654     2.458     0.010        12
++     2.731     2.484     0.010        12
++     2.812     2.512     0.010        12
++     2.892     2.540     0.010        12
++     2.971     2.568     0.010        12
++     3.052     2.598     0.010        12
++     3.131     2.627     0.010        12
++     3.210     2.657     0.010        12
++     3.289     2.687     0.010        12
++     3.371     2.719     0.010        12
++     3.450     2.749     0.010        12
++     3.532     2.782     0.010        12
++     3.611     2.814     0.010        12
++     3.688     2.845     0.010        12
++     3.766     2.877     0.010        12
++     3.848     2.911     0.010        12
++     3.927     2.944     0.010        12
++     4.010     2.978     0.010        12
++     4.092     3.013     0.010        12
++     4.168     3.045     0.010        12
++     4.246     3.078     0.010        12
++     4.322     3.111     0.010        12
++     4.402     3.147     0.010        12
++     4.481     3.181     0.010        12
++     4.562     3.217     0.010        12
++     4.642     3.253     0.010        12
++     4.726     3.291     0.010        12
++     0.000     0.000     0.000        -1
+Index: examples/r9.in
+===================================================================
+--- examples/r9.in	(revision 0)
++++ examples/r9.in	(revision 1072)
+@@ -0,0 +1,34 @@
++  &pltpar  isep=0, itx=1, itxout=2, idata=1,
++           imod=1, ibnd=0, iray=2, isum=2,
++           iroute=4, iplot=0, iseg=0, vred=0,
++           xwndow=292., ywndow=175.,
++           ircol=1, itcol=1
++           modout=0, dxmod=0.05, dzmod=0.002,
++           modi=1,2,5, xmmin=-10., xmmax=10.,
++  &end
++
++  &axepar  xmin=-10, xmax=10
++           zmin=0, zmax=3
++           tmin=0, tmax=2
++  &end   
++
++  &trapar  imodf=1, ibsmth=1, i2pt=0,
++           ishot=2
++           xshot=0.464
++           zshot=1.997
++           ray=1.2, 2.2, 3.2, 4.2, 5.2, 6.2, 7.2, 8.2, 9.2, 10.2, 11.2, 12.2, 13.2
++
++           nray=50
++           nsmax=50
++           aamin=0.00, aamax=90
++  &end
++
++  &invpar  invr=1
++           ximax=0
++           ivray=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
++  &end
++
++  &amppar iamp=1, isect=1, icmp=1, icomp=1,
++          xmins=-10., xmaxs=10., xincs=0.1,
++          hedcut=25, omega=50,
++  &end
+Index: examples/v9.in
+===================================================================
+--- examples/v9.in	(revision 0)
++++ examples/v9.in	(revision 1072)
+@@ -0,0 +1,119 @@
++ 1  -10.000  10.000
++ 0    0.000   0.000
++          0       0
++ 1  -10.000   0.000  10.000
++ 0    1.485   1.485   1.485
++          0       1       0
++ 1  -10.000   0.000  10.000
++ 0    1.492   1.492   1.492
++          0       1       0
++ 2  -10.000   0.000  10.000
++ 0    1.997   1.997   1.997
++          0       1       0
++ 2  -10.000  10.000
++ 0    1.640   1.640
++          0       0
++ 2  -10.000  10.000
++ 0    1.650   1.650
++          0       0
++ 3  -10.000  10.000
++ 0    2.080   2.080
++          0       0
++ 3  -10.000  10.000
++ 0    1.640   1.640
++          0       0
++ 3  -10.000  10.000
++ 0    1.640   1.640
++          0       0
++ 4  -10.000  10.000
++ 0    2.113   2.110
++          0       0
++ 4  -10.000  10.000
++ 0    1.640   1.640
++          0       0
++ 4  -10.000  10.000
++ 0    1.650   1.650
++          0       0
++ 5  -10.000  10.000
++ 0    2.130   2.130
++          0       0
++ 5  -10.000  10.000
++ 0    1.770   1.770
++          0       0
++ 5  -10.000  10.000
++ 0    1.780   1.780
++          0       0
++ 6  -10.000  10.000
++ 0    2.200   2.190
++          0       0
++ 6  -10.000  10.000
++ 0    1.830   1.830
++          0       0
++ 6  -10.000  10.000
++ 0    1.830   1.830
++          0       0
++ 7  -10.000  10.000
++ 0    2.260   2.250
++          0       0
++ 7  -10.000  10.000
++ 0    1.930   1.930
++          0       0
++ 7  -10.000  10.000
++ 0    1.940   1.940
++          0       0
++ 8  -10.000  10.000
++ 0    2.300   2.290
++          0       0
++ 8  -10.000  10.000
++ 0    1.940   1.940
++          0       0
++ 8  -10.000  10.000
++ 0    1.940   1.940
++          0       0
++ 9  -10.000  10.000
++ 0    2.350   2.350
++          0       0
++ 9  -10.000  10.000
++ 0    2.160   2.160
++          0       0
++ 9  -10.000  10.000
++ 0    2.160   2.160
++          0       0
++10  -10.000  10.000
++ 0    2.420   2.410
++          0       0
++10  -10.000  10.000
++ 0    1.820   1.820
++          0       0
++10  -10.000  10.000
++ 0    1.840   1.840
++          0       0
++11  -10.000  10.000
++ 0    2.450   2.450
++          0       0
++11  -10.000  10.000
++ 0    1.860   1.860
++          0       0
++11  -10.000  10.000
++ 0    1.870   1.870
++          0       0
++12  -10.000  10.000
++ 0    2.550   2.550
++          0       0
++12  -10.000  10.000
++ 0    2.180   2.180
++          0       0
++12  -10.000  10.000
++ 0    2.190   2.190
++          0       0
++13  -10.000  10.000
++ 0    2.670   2.670
++          0       0
++13  -10.000  10.000
++ 0    2.190   2.190
++          0       0
++13  -10.000  10.000
++ 0    2.220   2.220
++          0       0
++14  -10.000  10.000
++ 0    2.700   2.700
+Index: examples/vm9.in
+===================================================================
+--- examples/vm9.in	(revision 0)
++++ examples/vm9.in	(revision 1072)
+@@ -0,0 +1,15 @@
++  &pltpar  izort=1, imod=0, ivel=0, ivp=1, ivrms=0,
++           velht=.5, xtinc=.1, ntsmth=0, iplot=2,  
++           idump=0, inode=1, symht=3., idcol=2, ivcol=4,
++           xwndow=292., ywndow=175.,
++  &end
++  &axepar  xmin=-10., xmax=10., xmm=200.,
++           zmin=1., zmax=3., zmm=150., 
++           vmin=1.4, vmax=2.5, vmm=200., 
++           vrmin=0., vrmax=7.,
++           tmin=1., tmax=4., tmm=150.,
++           albht=3., 
++  &end
++  &modpar dvvmax=.5 dlvmax=.10, dsmax=20.,
++          velmax=8.5,
++  &end
